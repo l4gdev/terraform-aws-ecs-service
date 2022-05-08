@@ -1,6 +1,18 @@
 locals {
-  env_mapped     = [for k, v in var.application_config.environments : { name = k, value = v }]
-  secrets_mapped = [for k,n in aws_secretsmanager_secret.secret_env : { name = k, valueFrom = n.arn }]
+  env_mapped = [for k, v in var.application_config.environments : { name = k, value = v }]
+
+  secretmanager_json_load = [for k, v in data.aws_secretsmanager_secret_version.secrets :
+    [for secret_name, _ in nonsensitive(jsondecode(v.secret_string)) : # marked as non sensitive as it is just name and ARN
+      {
+        name      = secret_name,
+        valueFrom = "${v.arn}:${secret_name}"
+      }
+  ]]
+
+  check_if_secretmanager_json_load_not_empty = length(local.secretmanager_json_load) > 0 ? tolist(local.secretmanager_json_load)[0]: []
+  decelerated_secretmanage_placeholders =[for k, n in aws_secretsmanager_secret.secret_env : { name = k, valueFrom = n.arn }]
+  secrets_mapped = concat(local.decelerated_secretmanage_placeholders,local.check_if_secretmanager_json_load_not_empty)
+
 
   nginx_container_configuration = {
     name : "nginx",
@@ -110,7 +122,6 @@ resource "aws_ecs_task_definition" "service" {
   }
 
 }
-
 
 data "aws_region" "current" {}
 
