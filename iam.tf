@@ -22,7 +22,8 @@ resource "aws_iam_role_policy_attachment" "ecs-execution" {
 
 
 resource "aws_iam_role_policy" "ssm_access" {
-  role = aws_iam_role.ecs-execution.name
+  count = length(local.check_if_secretmanager_json_load_not_empty) > 0 ? 1 : 0
+  role  = aws_iam_role.ecs-execution.name
   policy = jsonencode({
     Version : "2012-10-17",
     Statement : [
