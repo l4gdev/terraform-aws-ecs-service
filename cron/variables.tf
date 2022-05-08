@@ -8,7 +8,7 @@ variable "ecs_settings" {
 variable "iam_role_arn" {
 
 }
-variable "crone_settings" {
+variable "cron_settings" {
   type = object({
     name                = string
     args                = string

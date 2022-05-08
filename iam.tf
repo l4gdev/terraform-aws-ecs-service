@@ -1,5 +1,5 @@
 resource "aws_iam_role" "ecs-execution" {
-  name = lower("${var.tags.Environment}-${var.tags.Service}-ecs-task-execution-role")
+  name = lower("${var.tags.Environment}-${var.tags.Service}-${var.ecs_settings.ecs_launch_type}-ecs-task-execution-role")
   assume_role_policy = jsonencode({
     "Version" : "2012-10-17",
     "Statement" : [
@@ -22,7 +22,8 @@ resource "aws_iam_role_policy_attachment" "ecs-execution" {
 
 
 resource "aws_iam_role_policy" "ssm_access" {
-  role = aws_iam_role.ecs-execution.name
+  count = length(local.check_if_secretmanager_json_load_not_empty) > 0 ? 1 : 0
+  role  = aws_iam_role.ecs-execution.name
   policy = jsonencode({
     Version : "2012-10-17",
     Statement : [
@@ -49,7 +50,7 @@ resource "aws_iam_role_policy" "ssm_access" {
 ################# Service role #################
 
 resource "aws_iam_role" "service" {
-  name = lower("${var.tags.Environment}-${var.tags.Service}-ecs-task-service-role")
+  name = lower("${var.tags.Environment}-${var.tags.Service}-${var.ecs_settings.ecs_launch_type}-ecs-task-service-role")
   assume_role_policy = jsonencode({
     Version : "2012-10-17",
     Statement : [

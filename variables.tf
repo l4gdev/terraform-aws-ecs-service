@@ -150,6 +150,6 @@ variable "tags" {
 
 variable "secret_environments_placeholder" {
   type        = set(string)
-  default     = [""]
+  default     = []
   description = "List of names of secret envs for example [\"MYSQL_PASSWORD\"]. That module will create placeholders at AWS secret manager that you will have to fulfil. the list of ARNs is available at output."
 }
