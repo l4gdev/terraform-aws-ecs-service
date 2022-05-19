@@ -38,7 +38,6 @@ variable "scheduling_strategy" {
 variable "application_config" {
   type = object({
     name         = string,
-    domain       = string,
     cpu          = number,
     memory       = number,
     image        = string,
@@ -47,7 +46,7 @@ variable "application_config" {
   })
 }
 
-variable "health_check" {
+variable "health_checks" {
   type = list(object({
     enabled             = bool
     healthy_threshold   = number
@@ -108,7 +107,7 @@ variable "vpc_id" {
 }
 
 variable "subnets" {
-  type = list(string)
+  type    = list(string)
   #  validation {
   #    condition =  var.ecs_settings.ecs_launch_type == "FARGATE" ? 1 : 0
   #    error_message = "Fargate launch type requires subnets."
@@ -121,7 +120,7 @@ variable "security_groups" {
   default = []
 }
 
-variable "aws_alb_listener_rule_condition" {
+variable "aws_alb_listener_rule_conditions" {
   default = []
 
   type = list(object({
@@ -133,23 +132,32 @@ variable "aws_alb_listener_rule_condition" {
 
   validation {
     condition = alltrue([
-      for o in var.aws_alb_listener_rule_condition : contains([
-        "host_header", "path_pattern"
-      ], o.type)
+    for o in var.aws_alb_listener_rule_conditions : contains([
+      "host_header", "path_pattern"
+    ], o.type)
     ])
     error_message = "Type have to be host_header or path_pattern."
   }
 }
 
 variable "tags" {
-      type = object({
-      Environment = string
-      Service     = string
-    })
-  }
+  type    = map(string)
+  default = {}
+}
 
-variable "secret_environments_placeholder" {
+variable "environment_variables_placeholder" {
   type        = set(string)
   default     = []
   description = "List of names of secret envs for example [\"MYSQL_PASSWORD\"]. That module will create placeholders at AWS secret manager that you will have to fulfil. the list of ARNs is available at output."
+}
+
+variable "list_of_secrets_in_secrets_manager_to_load" {
+  type    = set(string)
+  default = []
+}
+
+variable "service_policy" {
+  type        = string
+  description = "please use aws_iam_policy_document to define your policy"
+  default     = "{}"
 }

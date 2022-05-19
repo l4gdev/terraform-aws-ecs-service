@@ -8,7 +8,7 @@ resource "aws_lb_listener_rule" "web-app" {
   }
 
   dynamic "condition" {
-    for_each = var.aws_alb_listener_rule_condition
+    for_each = var.aws_alb_listener_rule_conditions
 
     content {
       dynamic "host_header" {
@@ -25,6 +25,7 @@ resource "aws_lb_listener_rule" "web-app" {
       }
     }
   }
+  tags = local.tags
 }
 
 resource "aws_lb_target_group" "app" {
@@ -36,7 +37,7 @@ resource "aws_lb_target_group" "app" {
   vpc_id      = var.vpc_id
 
   dynamic "health_check" {
-    for_each = var.health_check
+    for_each = var.health_checks
     content {
       enabled             = health_check.value["enabled"]
       healthy_threshold   = health_check.value["healthy_threshold"]
@@ -47,7 +48,5 @@ resource "aws_lb_target_group" "app" {
       unhealthy_threshold = health_check.value["unhealthy_threshold"]
     }
   }
+  tags = local.tags
 }
-
-
-

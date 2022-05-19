@@ -1,4 +1,8 @@
 locals {
+  tags = merge({
+    Service = var.application_config.name
+  }, var.tags)
+
   env_mapped = [
     for k, v in var.application_config.environments :
     {
@@ -29,7 +33,6 @@ locals {
   ]
 
   secrets_mapped = concat(local.decelerated_secretmanage_placeholders, local.check_if_secretmanager_json_load_not_empty)
-
 
   nginx_container_configuration = {
     name : "nginx",
@@ -115,11 +118,7 @@ locals {
     WORKER = jsonencode([local.worker_node_container_configuration]),
     CRON   = jsonencode([local.worker_node_container_configuration]),
   }
-
 }
-
-data "aws_caller_identity" "current" {}
-
 
 resource "aws_ecs_task_definition" "service" {
   family                   = var.application_config.name
@@ -139,12 +138,11 @@ resource "aws_ecs_task_definition" "service" {
       operating_system_family = "LINUX"
     }
   }
-
+  tags = local.tags
 }
-
-data "aws_region" "current" {}
 
 resource "aws_cloudwatch_log_group" "task_log_group" {
   name = "/ecs/${var.ecs_settings.run_type}/${var.application_config.name}"
+  tags = local.tags
 }
 
