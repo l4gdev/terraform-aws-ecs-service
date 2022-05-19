@@ -15,7 +15,7 @@ resource "aws_ecs_service" "service_web" {
     container_name   = var.ecs_settings.lang == "PHP" ? "nginx" : var.application_config.name
     container_port   = var.ecs_settings.lang == "PHP" ? 80 : var.application_config.port
   }
-
+  tags = local.tags
   lifecycle {
     ignore_changes = [desired_count]
   }

@@ -19,6 +19,7 @@ resource "aws_ecs_service" "service_worker" {
     }
   }
 
+  tags = local.tags
 
   lifecycle {
     ignore_changes = [desired_count]

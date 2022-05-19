@@ -1,13 +1,15 @@
-
 variable "task_definition_arn" {
-
+  type = string
 }
+
 variable "ecs_settings" {
 
 }
-variable "iam_role_arn" {
 
+variable "iam_role_arn" {
+  type = string
 }
+
 variable "cron_settings" {
   type = object({
     name                = string
@@ -19,5 +21,13 @@ variable "cron_settings" {
 }
 
 variable "application_config" {
-
+  type = object({
+    name         = string,
+    domain       = string,
+    cpu          = number,
+    memory       = number,
+    image        = string,
+    port         = number
+    environments = any
+  })
 }

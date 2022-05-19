@@ -1,5 +1,5 @@
 resource "aws_iam_role" "ecs-execution" {
-  name = lower("${var.tags.Environment}-${var.tags.Service}-${var.ecs_settings.ecs_launch_type}-ecs-task-execution-role")
+  name = lower("${local.tags.Service}-${var.ecs_settings.ecs_launch_type}-ecs-task-execution-role")
   assume_role_policy = jsonencode({
     "Version" : "2012-10-17",
     "Statement" : [
@@ -13,13 +13,13 @@ resource "aws_iam_role" "ecs-execution" {
       }
     ]
   })
+  tags = local.tags
 }
 
 resource "aws_iam_role_policy_attachment" "ecs-execution" {
   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
   role       = aws_iam_role.ecs-execution.name
 }
-
 
 resource "aws_iam_role_policy" "ssm_access" {
   count = length(local.check_if_secretmanager_json_load_not_empty) > 0 ? 1 : 0
@@ -50,7 +50,7 @@ resource "aws_iam_role_policy" "ssm_access" {
 ################# Service role #################
 
 resource "aws_iam_role" "service" {
-  name = lower("${var.tags.Environment}-${var.tags.Service}-${var.ecs_settings.ecs_launch_type}-ecs-task-service-role")
+  name = lower("${local.tags.Service}-${var.ecs_settings.ecs_launch_type}-ecs-task-service-role")
   assume_role_policy = jsonencode({
     Version : "2012-10-17",
     Statement : [
@@ -64,16 +64,11 @@ resource "aws_iam_role" "service" {
       }
     ]
   })
+  tags = local.tags
 }
 
 resource "aws_iam_role_policy" "service" {
   count  = var.service_policy == "{}" ? 0 : 1
   role   = aws_iam_role.service.name
   policy = var.service_policy
-}
-
-variable "service_policy" {
-  type        = string
-  description = "please use aws_iam_policy_document to define your policy"
-  default     = "{}"
 }
