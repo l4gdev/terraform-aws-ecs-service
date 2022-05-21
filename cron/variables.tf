@@ -23,7 +23,6 @@ variable "cron_settings" {
 variable "application_config" {
   type = object({
     name         = string,
-    domain       = string,
     cpu          = number,
     memory       = number,
     image        = string,
