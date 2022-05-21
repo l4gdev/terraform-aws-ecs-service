@@ -38,7 +38,6 @@ variable "scheduling_strategy" {
 variable "application_config" {
   type = object({
     name         = string,
-    domain       = string,
     cpu          = number,
     memory       = number,
     image        = string,
