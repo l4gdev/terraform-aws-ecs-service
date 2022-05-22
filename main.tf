@@ -11,18 +11,18 @@ locals {
     }
   ]
 
-  secretmanager_json_load = [
+  secretmanager_json_load = flatten([
     for k, v in data.aws_secretsmanager_secret_version.secrets :
     [
       for secret_name, _ in nonsensitive(jsondecode(v.secret_string)) : # marked as non sensitive as it is just name and ARN
       {
         name      = secret_name,
-        valueFrom = "${v.arn}:${secret_name}"
+        valueFrom = "${v.arn}:${secret_name}::"
       }
     ]
-  ]
+  ])
 
-  check_if_secretmanager_json_load_not_empty = length(local.secretmanager_json_load) > 0 ? tolist(local.secretmanager_json_load)[0] : []
+  check_if_secretmanager_json_load_not_empty = length(local.secretmanager_json_load) > 0 ? tolist(local.secretmanager_json_load) : []
 
   decelerated_secretmanage_placeholders = [
     for k, n in aws_secretsmanager_secret.secret_env :
