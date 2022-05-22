@@ -68,8 +68,15 @@ resource "aws_iam_role" "service" {
 
 ################# Custom application policy ##################
 resource "aws_iam_role_policy" "service" {
-  count  = var.service_policy == "{}" ? 0 : 1
   role   = aws_iam_role.service.name
-  policy = var.service_policy
+  policy = var.service_policy == "" ? data.aws_iam_policy_document.placeholder.json : var.service_policy
+}
+
+data "aws_iam_policy_document" "placeholder" {
+  statement {
+    effect    = "Deny"
+    actions   = ["s3:ListBucket"]
+    resources = ["arn:aws:s3:::PERMISION_PLACEHOLDER"]
+  }
 }
 

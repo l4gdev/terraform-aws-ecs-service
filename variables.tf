@@ -107,7 +107,7 @@ variable "vpc_id" {
 }
 
 variable "subnets" {
-  type    = list(string)
+  type = list(string)
   #  validation {
   #    condition =  var.ecs_settings.ecs_launch_type == "FARGATE" ? 1 : 0
   #    error_message = "Fargate launch type requires subnets."
@@ -132,9 +132,9 @@ variable "aws_alb_listener_rule_conditions" {
 
   validation {
     condition = alltrue([
-    for o in var.aws_alb_listener_rule_conditions : contains([
-      "host_header", "path_pattern"
-    ], o.type)
+      for o in var.aws_alb_listener_rule_conditions : contains([
+        "host_header", "path_pattern"
+      ], o.type)
     ])
     error_message = "Type have to be host_header or path_pattern."
   }
@@ -159,5 +159,5 @@ variable "list_of_secrets_in_secrets_manager_to_load" {
 variable "service_policy" {
   type        = string
   description = "please use aws_iam_policy_document to define your policy"
-  default     = "{}"
+  default     = ""
 }
