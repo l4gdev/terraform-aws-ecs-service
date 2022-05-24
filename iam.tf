@@ -41,7 +41,7 @@ resource "aws_iam_role_policy" "ssm_access" {
         Action : [
           "secretsmanager:GetSecretValue",
         ],
-        Resource : [for x in local.check_if_secretmanager_json_load_not_empty : x.valueFrom]
+        Resource : [for x in local.check_if_secretmanager_json_load_not_empty : replace(x.valueFrom, ":${split(":", x.valueFrom)[7]}::", "")]
       }
     ]
   })

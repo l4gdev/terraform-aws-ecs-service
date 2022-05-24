@@ -17,7 +17,7 @@ locals {
       for secret_name, _ in nonsensitive(jsondecode(v.secret_string)) : # marked as non sensitive as it is just name and ARN
       {
         name      = secret_name,
-        valueFrom = "${v.arn}:${secret_name}"
+        valueFrom = "${v.arn}:${secret_name}::"
       }
     ]
   ])
