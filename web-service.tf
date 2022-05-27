@@ -9,13 +9,16 @@ resource "aws_ecs_service" "service_web" {
   launch_type                        = var.ecs_settings.ecs_launch_type
   deployment_minimum_healthy_percent = var.desired_count == 1 ? 0 : 50
   deployment_maximum_percent         = 150
+  propagate_tags                     = "TASK_DEFINITION"
 
   load_balancer {
     target_group_arn = aws_lb_target_group.app[0].arn
     container_name   = var.ecs_settings.lang == "PHP" ? "nginx" : var.application_config.name
     container_port   = var.ecs_settings.lang == "PHP" ? 80 : var.application_config.port
   }
-  tags = local.tags
+  tags = merge(local.tags, {
+    Type = "web"
+  })
   lifecycle {
     ignore_changes = [desired_count]
   }
