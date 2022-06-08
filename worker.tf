@@ -9,6 +9,7 @@ resource "aws_ecs_service" "service_worker" {
   deployment_minimum_healthy_percent = 0
   deployment_maximum_percent         = 100
   scheduling_strategy                = var.scheduling_strategy
+  propagate_tags                     = "TASK_DEFINITION"
 
   dynamic "network_configuration" {
     for_each = var.ecs_settings.ecs_launch_type == "FARGATE" ? [1] : []
