@@ -30,3 +30,15 @@ variable "application_config" {
     environments = any
   })
 }
+
+variable "tags" {}
+variable "launch_type" {
+
+}
+
+variable "subnets" {
+  default = ""
+}
+variable "security_groups" {
+  default = ""
+}

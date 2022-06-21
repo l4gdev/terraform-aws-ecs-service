@@ -50,4 +50,9 @@ module "cron" {
   ecs_settings        = var.ecs_settings
   iam_role_arn        = aws_iam_role.ecs_events[0].arn
   task_definition_arn = aws_ecs_task_definition.service.arn
+  tags                = local.tags
+  launch_type         = var.ecs_settings.ecs_launch_type
+  subnets             = var.subnets
+  security_groups     = var.security_groups
+
 }
