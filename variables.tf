@@ -10,8 +10,8 @@ variable "ecs_settings" {
     error_message = "ECS launch type can only be FARGATE or EC2."
   }
   validation {
-    condition     = contains(["WEB", "WORKER", "CRON"], var.ecs_settings.run_type)
-    error_message = "Run type can be WEB, WORKER, CRON."
+    condition     = contains(["WEB", "WORKER", "CRON", "NLB"], var.ecs_settings.run_type)
+    error_message = "Run type can be WEB, WORKER, CRON, NLB."
   }
   validation {
     condition     = contains(["PHP", "NODE"], var.ecs_settings.lang)
@@ -41,7 +41,7 @@ variable "application_config" {
     cpu          = number,
     memory       = number,
     image        = string,
-    port         = number
+    port         = optional(number)
     environments = any
   })
 }
@@ -160,4 +160,19 @@ variable "service_policy" {
   type        = string
   description = "please use aws_iam_policy_document to define your policy"
   default     = ""
+}
+
+
+variable "network_lb" {
+  type = object({
+    nlb_arn = string,
+    port_configuration = set(object({
+      protocol = string,
+      port     = number
+    }))
+  })
+  default = {
+    nlb_arn            = "",
+    port_configuration = []
+  }
 }

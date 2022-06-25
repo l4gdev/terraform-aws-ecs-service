@@ -34,87 +34,18 @@ locals {
 
   secrets_mapped = concat(local.decelerated_secretmanage_placeholders, local.check_if_secretmanager_json_load_not_empty)
 
-  nginx_container_configuration = {
-    name : "nginx",
-    image : "nginx:latest"
-    portMappings : [
-      {
-        "containerPort" : 80,
-        "hostPort" : 0,
-        "protocol" : "tcp"
-      }
-    ],
-    links = [
-      "${var.application_config.name}:php"
-    ]
-  }
-
-  web_node_container_configuration = {
-    name : var.application_config.name,
-    environment : local.env_mapped,
-    secrets : local.secrets_mapped,
-    essential : true,
-    image : var.application_config.image,
-    portMappings : [
-      {
-        "containerPort" : var.application_config.port,
-        "hostPort" : 0,
-        "protocol" : "tcp"
-      }
-    ]
-    logConfiguration : {
-      logDriver : "awslogs",
-      options : {
-        awslogs-group : aws_cloudwatch_log_group.task_log_group.name,
-        awslogs-region : data.aws_region.current.name,
-        awslogs-create-group : "true",
-        awslogs-stream-prefix : "ecs",
-      }
-    },
-  }
-
-  worker_node_container_configuration = {
-    name : var.application_config.name,
-    environment : local.env_mapped,
-    secrets : local.secrets_mapped,
-    essential : true,
-    image : var.application_config.image,
-    command : ["node", var.worker_configuration.execution_script, var.worker_configuration.args]
-    logConfiguration : {
-      logDriver : "awslogs",
-      options : {
-        awslogs-group : aws_cloudwatch_log_group.task_log_group.name,
-        awslogs-region : data.aws_region.current.name,
-        awslogs-create-group : "true",
-        awslogs-stream-prefix : "ecs",
-      }
-    },
-  }
-
-  php_container_configuration = {
-    name : var.application_config.name,
-    environment : local.env_mapped,
-    secrets : local.secrets_mapped,
-    essential : true,
-    image : var.application_config.image,
-    logConfiguration : {
-      logDriver : "awslogs",
-      options : {
-        awslogs-group : aws_cloudwatch_log_group.task_log_group.name,
-        awslogs-region : data.aws_region.current.name,
-        awslogs-create-group : "true",
-        awslogs-stream-prefix : "ecs",
-      }
-    },
-  }
-
   WEB = {
     NODE = jsonencode([local.web_node_container_configuration]),
     PHP  = jsonencode([local.nginx_container_configuration, local.php_container_configuration]),
   }
 
+  NLB = {
+    NODE = jsonencode([local.nlb_node_container_configuration])
+  }
+
   task_app_configuration = {
     WEB    = local.WEB[var.ecs_settings.lang],
+    NLB    = local.NLB[var.ecs_settings.lang],
     WORKER = jsonencode([local.worker_node_container_configuration]),
     CRON   = jsonencode([local.worker_node_container_configuration]),
   }

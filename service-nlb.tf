@@ -1,5 +1,5 @@
-resource "aws_ecs_service" "service_web" {
-  count = contains(["WEB"], var.ecs_settings.run_type) ? 1 : 0
+resource "aws_ecs_service" "service_net" {
+  count = contains(["NLB"], var.ecs_settings.run_type) ? 1 : 0
 
   name                               = var.application_config.name
   cluster                            = var.ecs_settings.ecs_cluster_name
@@ -11,14 +11,28 @@ resource "aws_ecs_service" "service_web" {
   deployment_maximum_percent         = 150
   propagate_tags                     = "TASK_DEFINITION"
 
-  load_balancer {
-    target_group_arn = aws_lb_target_group.app[0].arn
-    container_name   = var.ecs_settings.lang == "PHP" ? "nginx" : var.application_config.name
-    container_port   = var.ecs_settings.lang == "PHP" ? 80 : var.application_config.port
+  dynamic "load_balancer" {
+    for_each = aws_lb_target_group.network_lb_target
+    content {
+      target_group_arn = load_balancer.value.arn
+      container_port   = load_balancer.value.port
+      container_name   = var.application_config.name
+    }
   }
+  dynamic "network_configuration" {
+    for_each = var.ecs_settings.ecs_launch_type == "FARGATE" ? [1] : []
+    content {
+      subnets          = var.subnets
+      security_groups  = var.security_groups
+      assign_public_ip = false
+    }
+  }
+
+
   tags = merge(local.tags, {
-    Type = "web"
+    Type = "net"
   })
+
   lifecycle {
     ignore_changes = [desired_count]
   }
