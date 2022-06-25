@@ -30,7 +30,7 @@ resource "aws_lb_listener_rule" "web-app" {
 
 resource "aws_lb_target_group" "app" {
   count       = contains(["WEB"], var.ecs_settings.run_type) ? 1 : 0
-  name        = "${var.application_config.name}-${count.index}"
+  name        = var.application_config.name
   port        = 80
   protocol    = "HTTP"
   target_type = "instance"
