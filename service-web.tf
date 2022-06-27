@@ -16,7 +16,7 @@ resource "aws_ecs_service" "service_web" {
     container_name   = var.ecs_settings.lang == "PHP" ? "nginx" : var.application_config.name
     container_port   = var.ecs_settings.lang == "PHP" ? 80 : var.application_config.port
   }
-    dynamic "network_configuration" {
+  dynamic "network_configuration" {
     for_each = var.ecs_settings.ecs_launch_type == "FARGATE" ? [1] : []
     content {
       subnets          = var.subnets

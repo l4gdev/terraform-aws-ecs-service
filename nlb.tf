@@ -21,7 +21,7 @@ resource "aws_lb_listener" "network_lb_listener" {
 
 resource "aws_lb_target_group" "network_lb_target" {
   for_each    = local.nlb_port_map
-  name        = "${var.application_config.name}-${each.key}"
+  name        = lower("${var.application_config.name}-${each.key}")
   port        = each.value.port
   protocol    = each.value.protocol
   target_type = var.ecs_settings.ecs_launch_type == "FARGATE" ? "ip" : "instance"
@@ -30,12 +30,3 @@ resource "aws_lb_target_group" "network_lb_target" {
 }
 
 
-variable "network_lb" {
-  type = object({
-    nlb_arn = string,
-    port_configuration = set(object({
-      protocol = string,
-      port     = number
-    }))
-  })
-}

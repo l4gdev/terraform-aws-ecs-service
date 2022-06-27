@@ -161,3 +161,18 @@ variable "service_policy" {
   description = "please use aws_iam_policy_document to define your policy"
   default     = ""
 }
+
+
+variable "network_lb" {
+  type = object({
+    nlb_arn = string,
+    port_configuration = set(object({
+      protocol = string,
+      port     = number
+    }))
+  })
+  default = {
+    nlb_arn            = "",
+    port_configuration = []
+  }
+}
