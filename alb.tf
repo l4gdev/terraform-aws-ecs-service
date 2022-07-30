@@ -1,6 +1,11 @@
 resource "aws_lb_listener_rule" "web-app" {
   count        = contains(["WEB"], var.ecs_settings.run_type) ? 1 : 0
   listener_arn = var.alb_listener_arn
+  lifecycle {
+    replace_triggered_by = [
+      aws_lb_target_group.app
+    ]
+  }
   action {
     type             = "forward"
     target_group_arn = aws_lb_target_group.app[0].arn
@@ -25,11 +30,6 @@ resource "aws_lb_listener_rule" "web-app" {
     }
   }
   tags = local.tags
-  lifecycle {
-    replace_triggered_by = [
-      aws_lb_target_group.app
-    ]
-  }
 }
 
 resource "aws_lb_target_group" "app" {
