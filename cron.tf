@@ -43,8 +43,9 @@ resource "aws_iam_role_policy" "ecs_events_run_task_with_any_role" {
 }
 
 module "cron" {
-  source              = "./cron/"
-  for_each            = { for cron in var.cron.settings : replace(cron.name, ":", "-") => cron }
+  source   = "./cron/"
+  for_each = { for cron in var.cron.settings : replace(cron.name, ":", "-") => cron }
+
   application_config  = var.application_config
   cron_settings       = merge(each.value, { execution_script = var.cron.execution_script })
   ecs_settings        = var.ecs_settings
@@ -54,5 +55,4 @@ module "cron" {
   launch_type         = var.ecs_settings.ecs_launch_type
   subnets             = var.subnets
   security_groups     = var.security_groups
-
 }
