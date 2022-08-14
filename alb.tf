@@ -1,6 +1,7 @@
 resource "aws_lb_listener_rule" "web-app" {
   count        = contains(["WEB"], var.ecs_settings.run_type) ? 1 : 0
   listener_arn = var.alb_listener_arn
+
   action {
     type             = "forward"
     target_group_arn = aws_lb_target_group.app[0].arn
@@ -18,6 +19,12 @@ resource "aws_lb_listener_rule" "web-app" {
       }
       dynamic "path_pattern" {
         for_each = condition.value["type"] == "path_pattern" ? [1] : []
+        content {
+          values = condition.value["values"]
+        }
+      }
+      dynamic "source_ip" {
+        for_each = condition.value["type"] == "source_ip" ? [1] : []
         content {
           values = condition.value["values"]
         }

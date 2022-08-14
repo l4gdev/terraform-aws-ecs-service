@@ -133,7 +133,7 @@ variable "aws_alb_listener_rule_conditions" {
   validation {
     condition = alltrue([
       for o in var.aws_alb_listener_rule_conditions : contains([
-        "host_header", "path_pattern"
+        "host_header", "path_pattern","source_ip"
       ], o.type)
     ])
     error_message = "Type have to be host_header or path_pattern."
@@ -175,4 +175,18 @@ variable "network_lb" {
     nlb_arn            = "",
     port_configuration = []
   }
+}
+
+variable "volumes" {
+  type = list(any)
+  default = []
+}
+
+variable "volumes_mount_point" {
+  type = list(object({
+    sourceVolume = string
+    containerPath = string
+    readOnly = bool
+  }))
+  default = []
 }

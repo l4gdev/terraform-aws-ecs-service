@@ -38,6 +38,7 @@ locals {
       }
     ]
     logConfiguration : local.log_configuration,
+    mountPoints : var.volumes_mount_point
   }
 
   nlb_node_container_configuration = {
@@ -62,6 +63,7 @@ locals {
     image : var.application_config.image,
     command : ["node", var.worker_configuration.execution_script, var.worker_configuration.args]
     logConfiguration : local.log_configuration,
+    mountPoints : var.volumes_mount_point
   }
 
   php_container_configuration = {
@@ -71,6 +73,6 @@ locals {
     essential : true,
     image : var.application_config.image,
     logConfiguration : local.log_configuration,
+    mountPoints : var.volumes_mount_point
   }
-
 }
