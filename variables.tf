@@ -25,6 +25,34 @@ variable "desired_count" {
   description = ""
 }
 
+variable "deployment" {
+  type = object({
+    first_deployment_desired_count = number # I have no idea
+    minimum_healthy_percent        = number
+    maximum_healthy_percent        = number
+    enable_asg                     = bool
+    auto_scaling = optional(object({
+      minimum = number
+      maximum = number
+      rules = list(object({
+        name               = string
+        metric             = string
+        metric_period      = number
+        cooldown           = number
+        threshold          = number
+        period             = number
+        evaluation_periods = number
+        scaling_adjustment = number
+      }))
+    }))
+  })
+  description = "Desired count will be ignored after first deployment"
+
+
+
+}
+
+
 variable "scheduling_strategy" {
   type        = string
   default     = "REPLICA"
@@ -133,7 +161,7 @@ variable "aws_alb_listener_rule_conditions" {
   validation {
     condition = alltrue([
       for o in var.aws_alb_listener_rule_conditions : contains([
-        "host_header", "path_pattern","source_ip"
+        "host_header", "path_pattern", "source_ip"
       ], o.type)
     ])
     error_message = "Type have to be host_header or path_pattern."
@@ -178,15 +206,15 @@ variable "network_lb" {
 }
 
 variable "volumes" {
-  type = list(any)
+  type    = list(any)
   default = []
 }
 
 variable "volumes_mount_point" {
   type = list(object({
-    sourceVolume = string
+    sourceVolume  = string
     containerPath = string
-    readOnly = bool
+    readOnly      = bool
   }))
   default = []
 }
