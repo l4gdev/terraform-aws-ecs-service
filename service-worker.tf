@@ -6,8 +6,8 @@ resource "aws_ecs_service" "service_worker" {
   task_definition                    = aws_ecs_task_definition.service.id
   desired_count                      = var.desired_count
   launch_type                        = var.ecs_settings.ecs_launch_type
-  deployment_minimum_healthy_percent = 0
-  deployment_maximum_percent         = 100
+  deployment_minimum_healthy_percent = var.deployment.minimum_healthy_percent
+  deployment_maximum_percent         = var.deployment.maximum_healthy_percent
   scheduling_strategy                = var.scheduling_strategy
   propagate_tags                     = "TASK_DEFINITION"
 

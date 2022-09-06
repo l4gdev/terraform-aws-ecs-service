@@ -7,8 +7,8 @@ resource "aws_ecs_service" "service_net" {
   desired_count                      = var.desired_count
   scheduling_strategy                = var.scheduling_strategy
   launch_type                        = var.ecs_settings.ecs_launch_type
-  deployment_minimum_healthy_percent = var.desired_count == 1 ? 0 : 50
-  deployment_maximum_percent         = 150
+  deployment_minimum_healthy_percent = var.deployment.minimum_healthy_percent
+  deployment_maximum_percent         = var.deployment.maximum_healthy_percent
   propagate_tags                     = "TASK_DEFINITION"
 
   dynamic "load_balancer" {

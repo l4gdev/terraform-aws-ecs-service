@@ -5,7 +5,7 @@ locals {
 }
 
 resource "aws_cloudwatch_event_rule" "rule" {
-  name                = "${var.application_config.name}-${replace(var.cron_settings.name, ":", "-")}"
+  name                = "${var.application_config.environment}-${var.application_config.name}-${replace(var.cron_settings.name, ":", "-")}"
   schedule_expression = var.cron_settings.schedule_expression
 }
 
@@ -15,7 +15,7 @@ data "aws_ecs_cluster" "cluster" {
 
 
 resource "aws_cloudwatch_event_target" "ecs_scheduled_task" {
-  target_id = "${var.application_config.name}-${replace(var.cron_settings.name, ":", "-")}"
+  target_id = "${var.application_config.environment}-${replace(var.cron_settings.name, ":", "-")}"
   arn       = data.aws_ecs_cluster.cluster.arn
   rule      = aws_cloudwatch_event_rule.rule.name
   role_arn  = var.iam_role_arn
@@ -43,8 +43,15 @@ resource "aws_cloudwatch_event_target" "ecs_scheduled_task" {
     {
       "containerOverrides" : [
         {
-          "command" : concat([local.cron_execution_binary[var.ecs_settings.lang], var.cron_settings.execution_script], split(" ", var.cron_settings.args))
+          "command" : concat([
+            local.cron_execution_binary[var.ecs_settings.lang], var.cron_settings.execution_script
+          ], split(" ", var.cron_settings.args))
           "name" : var.application_config.name
+          "logConfiguration" : {
+            "options" : {
+              awslogs-stream-prefix : "${var.application_config.name}-${replace(var.cron_settings.name, ":", "-")}",
+            }
+          }
         }
       ]
     }

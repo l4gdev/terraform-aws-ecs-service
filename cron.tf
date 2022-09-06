@@ -1,6 +1,6 @@
 resource "aws_iam_role" "ecs_events" {
   count = contains(["CRON"], var.ecs_settings.run_type) ? 1 : 0
-  name  = var.application_config.name
+  name  = "${var.application_config.environment}-${var.application_config.name}"
   assume_role_policy = jsonencode(
     {
       "Version" : "2012-10-17",
@@ -21,7 +21,7 @@ resource "aws_iam_role" "ecs_events" {
 resource "aws_iam_role_policy" "ecs_events_run_task_with_any_role" {
   count = contains(["CRON"], var.ecs_settings.run_type) ? 1 : 0
 
-  name = var.application_config.name
+  name = "${var.application_config.environment}-${var.application_config.name}"
   role = aws_iam_role.ecs_events[0].id
 
   policy = jsonencode(

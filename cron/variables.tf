@@ -22,12 +22,13 @@ variable "cron_settings" {
 
 variable "application_config" {
   type = object({
-    name         = string,
-    cpu          = number,
-    memory       = number,
-    image        = string,
-    port         = number
-    environments = any
+    name                   = string,
+    environment            = string,
+    cpu                    = number,
+    memory                 = number,
+    image                  = string,
+    port                   = optional(number)
+    environments_variables = any
   })
 }
 

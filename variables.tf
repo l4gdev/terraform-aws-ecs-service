@@ -14,8 +14,8 @@ variable "ecs_settings" {
     error_message = "Run type can be WEB, WORKER, CRON, NLB."
   }
   validation {
-    condition     = contains(["PHP", "NODE"], var.ecs_settings.lang)
-    error_message = "Lang can be set to PHP or NODE."
+    condition     = contains(["PHP", "STANDARD"], var.ecs_settings.lang)
+    error_message = "Lang can be set to PHP or STANDARD."
   }
 }
 
@@ -47,9 +47,6 @@ variable "deployment" {
     }))
   })
   description = "Desired count will be ignored after first deployment"
-
-
-
 }
 
 
@@ -65,13 +62,25 @@ variable "scheduling_strategy" {
 
 variable "application_config" {
   type = object({
-    name         = string,
-    cpu          = number,
-    memory       = number,
-    image        = string,
-    port         = optional(number)
-    environments = any
+    name                   = string,
+    environment            = string,
+    cpu                    = number,
+    memory                 = number,
+    image                  = string,
+    port                   = optional(number)
+    environments_variables = any
   })
+}
+
+variable "alb_deregistration_delay" {
+  type        = number
+  default     = 30
+  description = "The amount time for Elastic Load Balancing to wait before changing the state of a deregistering target from draining to unused. The range is 0-3600 seconds. The default value is 300 seconds"
+}
+variable "alb_slow_start" {
+  type        = number
+  default     = 0
+  description = "The amount time for targets to warm up before the load balancer sends them a full share of requests. The range is 30-900 seconds or 0 to disable. The default value is 0 seconds.The amount time for targets to warm up before the load balancer sends them a full share of requests. The range is 30-900 seconds or 0 to disable. The default value is 0 seconds."
 }
 
 variable "health_checks" {

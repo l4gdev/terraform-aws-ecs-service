@@ -4,7 +4,7 @@ locals {
   }, var.tags)
 
   env_mapped = [
-    for k, v in var.application_config.environments :
+    for k, v in var.application_config.environments_variables :
     {
       name  = k,
       value = v
@@ -35,30 +35,32 @@ locals {
   secrets_mapped = concat(local.decelerated_secretmanage_placeholders, local.check_if_secretmanager_json_load_not_empty)
 
   WEB = {
-    NODE = jsonencode([local.web_node_container_configuration]),
-    PHP  = jsonencode([local.nginx_container_configuration, local.php_container_configuration]),
+    STANDARD = local.web_standard_container_configuration,
+    PHP      = [local.nginx_container_configuration, local.php_container_configuration],
   }
 
   NLB = {
-    NODE = jsonencode([local.nlb_node_container_configuration])
+    STANDARD = local.nlb_standard_container_configuration
   }
 
   task_app_configuration = {
     WEB    = local.WEB[var.ecs_settings.lang],
     NLB    = local.NLB[var.ecs_settings.lang],
-    WORKER = jsonencode([local.worker_node_container_configuration]),
-    CRON   = jsonencode([local.worker_node_container_configuration]),
+    WORKER = [local.worker_standard_container_configuration],
+    CRON   = [local.worker_standard_container_configuration],
   }
+  datadog_sidecar = concat([local.datadog_fargate_sidecar], [local.task_app_configuration[var.ecs_settings.run_type]])
+  running_container_definitions = var.ecs_settings.ecs_launch_type == "FARGATE" && var.fargate_datadog_sidecar_parameters.key != null ? jsonencode(local.datadog_sidecar) : jsonencode([local.task_app_configuration[var.ecs_settings.run_type]])
 }
 
 resource "aws_ecs_task_definition" "service" {
-  family                   = var.application_config.name
+  family                   = "${var.application_config.environment}-${var.application_config.name}"
   execution_role_arn       = aws_iam_role.ecs-execution.arn
   network_mode             = var.ecs_settings.ecs_launch_type == "FARGATE" ? "awsvpc" : "bridge"
   requires_compatibilities = [var.ecs_settings.ecs_launch_type]
   cpu                      = var.application_config.cpu == 0 ? "" : var.application_config.cpu
   memory                   = var.application_config.memory
-  container_definitions    = local.task_app_configuration[var.ecs_settings.run_type]
+  container_definitions    = local.running_container_definitions
   task_role_arn            = aws_iam_role.service.arn
 
   dynamic "volume" {
@@ -98,7 +100,7 @@ resource "aws_ecs_task_definition" "service" {
 }
 
 resource "aws_cloudwatch_log_group" "task_log_group" {
-  name = "/ecs/${var.ecs_settings.run_type}/${var.application_config.name}"
+  name = "/ecs/${var.ecs_settings.run_type}/${var.application_config.environment}-${var.application_config.name}"
   tags = local.tags
 }
 

@@ -24,7 +24,7 @@ locals {
     ]
   }
 
-  web_node_container_configuration = {
+  web_standard_container_configuration = {
     name : var.application_config.name,
     environment : local.env_mapped,
     secrets : local.secrets_mapped,
@@ -41,7 +41,7 @@ locals {
     mountPoints : var.volumes_mount_point
   }
 
-  nlb_node_container_configuration = {
+  nlb_standard_container_configuration = {
     name : var.application_config.name,
     environment : local.env_mapped,
     secrets : local.secrets_mapped,
@@ -55,24 +55,57 @@ locals {
     logConfiguration : local.log_configuration,
   }
 
-  worker_node_container_configuration = {
-    name : var.application_config.name,
-    environment : local.env_mapped,
-    secrets : local.secrets_mapped,
-    essential : true,
-    image : var.application_config.image,
-    command : ["node", var.worker_configuration.execution_script, var.worker_configuration.args]
+  worker_standard_container_configuration = {
+    name             : var.application_config.name,
+    environment      : local.env_mapped,
+    secrets          : local.secrets_mapped,
+    essential        : true,
+    image            : var.application_config.image,
+    command          : ["node", var.worker_configuration.execution_script, var.worker_configuration.args]
     logConfiguration : local.log_configuration,
-    mountPoints : var.volumes_mount_point
+    mountPoints      : var.volumes_mount_point
+
   }
 
   php_container_configuration = {
-    name : var.application_config.name,
-    environment : local.env_mapped,
-    secrets : local.secrets_mapped,
-    essential : true,
-    image : var.application_config.image,
+    name             : var.application_config.name,
+    environment      : local.env_mapped,
+    secrets          : local.secrets_mapped,
+    essential        : true,
+    image            : var.application_config.image,
     logConfiguration : local.log_configuration,
-    mountPoints : var.volumes_mount_point
+    mountPoints      : var.volumes_mount_point
+  }
+
+  datadog_fargate_sidecar = {
+    name : "datadog"
+    image : var.fargate_datadog_sidecar_parameters.image,
+    environment : [
+      {
+        name : "DD_API_KEY"
+        value : var.fargate_datadog_sidecar_parameters
+      },
+      {
+        name : "ECS_FARGATE",
+        value : "true"
+      },
+      {
+        name : "DD_SITE"
+        value : var.fargate_datadog_sidecar_parameters.dd_site
+      }
+    ],
+  }
+}
+
+variable "fargate_datadog_sidecar_parameters" {
+  type = object({
+    image   = string
+    dd_site = string
+    key     = string
+  })
+  default = {
+    image   = "public.ecr.aws/datadog/agent:latest",
+    dd_site = "datadoghq.eu"
+    key     = null
   }
 }
