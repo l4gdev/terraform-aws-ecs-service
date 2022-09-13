@@ -1,6 +1,7 @@
 locals {
   cron_execution_binary = {
     NODE = "node"
+    STANDARD = "node" #TODO fix it....
   }
 }
 
