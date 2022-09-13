@@ -3,14 +3,16 @@ variable "auto_scaling" {
     minimum = number
     maximum = number
     rules = list(object({
-      name               = string
-      metric             = string
-      metric_period      = number
-      cooldown           = number
-      threshold          = number
-      period             = number
-      evaluation_periods = number
-      scaling_adjustment = number
+      name                = string
+      metric              = string
+      metric_period       = number
+      cooldown            = number
+      threshold           = number
+      period              = number
+      comparison_operator = string
+      statistic           = string
+      evaluation_periods  = number
+      scaling_adjustment  = number
     }))
   })
 }
@@ -22,5 +24,9 @@ variable "service_name" {
 }
 
 variable "environment" {
+  type = string
+}
+
+variable "app_name" {
   type = string
 }

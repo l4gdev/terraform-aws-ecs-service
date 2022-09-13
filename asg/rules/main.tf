@@ -1,6 +1,6 @@
 
 locals {
-  rule =  jsondecode(var.rule)
+  rule = jsondecode(var.rule)
 }
 
 
@@ -32,8 +32,8 @@ resource "aws_cloudwatch_metric_alarm" "alert" {
   namespace   = "AWS/ECS"
   metric_name = local.rule.metric
 
-  comparison_operator = "GreaterThanOrEqualToThreshold"
-  statistic           = "Average"
+  comparison_operator = local.rule.comparison_operator
+  statistic           = local.rule.statistic
 
   evaluation_periods = local.rule.evaluation_periods
   period             = local.rule.period
@@ -41,7 +41,7 @@ resource "aws_cloudwatch_metric_alarm" "alert" {
 
   dimensions = {
     ClusterName = var.cluster_name
-    ServiceName = var.service_name
+    ServiceName = var.app_name
   }
 
   alarm_actions = [
