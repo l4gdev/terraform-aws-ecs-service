@@ -50,7 +50,7 @@ locals {
     CRON   = [local.worker_standard_container_configuration],
   }
   datadog_sidecar = concat([local.datadog_fargate_sidecar], [local.task_app_configuration[var.ecs_settings.run_type]])
-  running_container_definitions = var.ecs_settings.ecs_launch_type == "FARGATE" && var.fargate_datadog_sidecar_parameters.key != null ? jsonencode(local.datadog_sidecar) : jsonencode([local.task_app_configuration[var.ecs_settings.run_type]])
+  running_container_definitions = var.ecs_settings.ecs_launch_type == "FARGATE" && var.fargate_datadog_sidecar_parameters.key != null ? jsonencode(local.datadog_sidecar) : jsonencode(local.task_app_configuration[var.ecs_settings.run_type])
 }
 
 resource "aws_ecs_task_definition" "service" {
