@@ -44,8 +44,8 @@ locals {
   }
 
   task_app_configuration = {
-    WEB    = local.WEB[var.ecs_settings.lang],
-    NLB    = local.NLB[var.ecs_settings.lang],
+    WEB    = [local.WEB[var.ecs_settings.lang]],
+    NLB    = [local.NLB[var.ecs_settings.lang]],
     WORKER = [local.worker_standard_container_configuration],
     CRON   = [local.worker_standard_container_configuration],
   }
