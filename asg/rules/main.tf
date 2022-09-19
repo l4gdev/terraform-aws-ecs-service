@@ -17,7 +17,8 @@ resource "aws_appautoscaling_policy" "ecs_policy" {
     metric_aggregation_type = "Maximum"
 
     step_adjustment {
-      metric_interval_upper_bound = 0
+      metric_interval_upper_bound = local.rule.scaling_adjustment < 0 ? 0 : null
+      metric_interval_lower_bound = local.rule.scaling_adjustment < 0 ? null : 0
       scaling_adjustment          = local.rule.scaling_adjustment
     }
   }
