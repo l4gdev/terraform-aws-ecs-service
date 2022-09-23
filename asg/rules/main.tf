@@ -1,8 +1,6 @@
-
 locals {
   rule = jsondecode(var.rule)
 }
-
 
 resource "aws_appautoscaling_policy" "ecs_policy" {
   name               = local.rule.name
