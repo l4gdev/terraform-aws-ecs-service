@@ -27,7 +27,7 @@ variable "desired_count" {
 
 variable "deployment" {
   type = object({
-    first_deployment_desired_count = number # I have no idea
+    first_deployment_desired_count = optional(number, 1) # I have no idea
     minimum_healthy_percent        = number
     maximum_healthy_percent        = number
     enable_asg                     = bool
@@ -35,16 +35,16 @@ variable "deployment" {
       minimum = number
       maximum = number
       rules = list(object({
-      name                = string
-      metric              = string
-      metric_period       = number
-      cooldown            = number
-      threshold           = number
-      period              = number
-      comparison_operator = string
-      statistic           = string
-      evaluation_periods  = number
-      scaling_adjustment  = number
+        name                = string
+        metric              = string
+        metric_period       = number
+        cooldown            = number
+        threshold           = number
+        period              = number
+        comparison_operator = string
+        statistic           = string
+        evaluation_periods  = number
+        scaling_adjustment  = number
       }))
     }))
   })
@@ -66,8 +66,8 @@ variable "application_config" {
   type = object({
     name                   = string,
     environment            = string,
-    cpu                    = number,
-    memory                 = number,
+    cpu                    = optional(number, 0),
+    memory                 = optional(number, 0),
     image                  = string,
     port                   = optional(number)
     environments_variables = any
@@ -87,7 +87,7 @@ variable "alb_slow_start" {
 
 variable "health_checks" {
   type = list(object({
-    enabled             = bool
+    enabled             = optional(bool, true)
     healthy_threshold   = number
     interval            = number
     matcher             = string
@@ -127,8 +127,9 @@ variable "cron" {
 
 variable "worker_configuration" {
   type = object({
-    execution_script = string
-    args             = string
+    binary           = optional(string, "node")
+    execution_script = optional(string, "")
+    args             = optional(string, "")
   })
   default = {
     execution_script = ""
