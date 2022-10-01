@@ -11,7 +11,7 @@ locals {
 
   nginx_container_configuration = {
     name  = "nginx",
-    image = "nginx=latest"
+    image = var.application_config.nginx_image != null ? var.application_config.nginx_image : "nginx:latest"
     portMappings = [
       {
         "containerPort" = 80,
