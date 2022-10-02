@@ -105,3 +105,8 @@ resource "aws_cloudwatch_log_group" "task_log_group" {
   tags = local.tags
 }
 
+resource "aws_cloudwatch_log_group" "task_log_group_nginx" {
+    count = var.application_config.nginx_image != "" ? 1 : 0
+    name = "/ecs/${var.ecs_settings.run_type}/${var.application_config.environment}-${var.application_config.name}-nginx"
+    tags = local.tags
+}
