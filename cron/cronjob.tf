@@ -42,15 +42,15 @@ resource "aws_cloudwatch_event_target" "ecs_scheduled_task" {
 
   input = jsonencode(
     {
-      "containerOverrides" : [
+      containerOverrides = [
         {
-          "command" : concat([
-            local.cron_execution_binary[var.ecs_settings.lang], var.cron_settings.execution_script
+          command = concat([
+            local.cron_execution_binary[var.ecs_settings.lang], try(var.cron_settings.execution_script, "")
           ], split(" ", var.cron_settings.args))
-          "name" : var.application_config.name
-          "logConfiguration" : {
-            "options" : {
-              awslogs-stream-prefix : "${var.application_config.name}-${replace(var.cron_settings.name, ":", "-")}",
+          name = var.application_config.name
+          logConfiguration = {
+            options = {
+              awslogs-stream-prefix = "${var.application_config.name}-${replace(var.cron_settings.name, ":", "-")}",
             }
           }
         }

@@ -4,7 +4,7 @@ resource "aws_ecs_service" "service_web" {
   name                               = var.application_config.name
   cluster                            = var.ecs_settings.ecs_cluster_name
   task_definition                    = aws_ecs_task_definition.service.id
-  desired_count                      = var.desired_count
+  desired_count                      = var.deployment.first_deployment_desired_count
   scheduling_strategy                = var.scheduling_strategy
   launch_type                        = var.ecs_settings.ecs_launch_type
   deployment_minimum_healthy_percent = var.deployment.minimum_healthy_percent

@@ -40,8 +40,8 @@ locals {
   }
 
   NLB = {
-        STANDARD = [local.nlb_standard_container_configuration],
-        PHP      = [local.nginx_container_configuration, local.php_container_configuration],
+    STANDARD = [local.nlb_standard_container_configuration],
+    PHP      = [local.nginx_container_configuration, local.php_container_configuration],
   }
 
   task_app_configuration = {
@@ -106,7 +106,7 @@ resource "aws_cloudwatch_log_group" "task_log_group" {
 }
 
 resource "aws_cloudwatch_log_group" "task_log_group_nginx" {
-    count = var.application_config.nginx_image != "" ? 1 : 0
-    name = "/ecs/${var.ecs_settings.run_type}/${var.application_config.environment}-${var.application_config.name}-nginx"
-    tags = local.tags
+  count = var.application_config.nginx_image != "" ? 1 : 0
+  name  = "/ecs/${var.ecs_settings.run_type}/${var.application_config.environment}-${var.application_config.name}-nginx"
+  tags  = local.tags
 }
