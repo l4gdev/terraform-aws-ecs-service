@@ -19,18 +19,12 @@ variable "ecs_settings" {
   }
 }
 
-variable "desired_count" {
-  type        = number
-  default     = 1
-  description = ""
-}
-
 variable "deployment" {
   type = object({
     first_deployment_desired_count = optional(number, 1) # I have no idea
-    minimum_healthy_percent        = number
-    maximum_healthy_percent        = number
-    enable_asg                     = bool
+    minimum_healthy_percent        = optional(number, 50)
+    maximum_healthy_percent        = optional(number, 200)
+    enable_asg                     = optional(bool, false)
     auto_scaling = optional(object({
       minimum = number
       maximum = number
@@ -50,7 +44,6 @@ variable "deployment" {
   })
   description = "Desired count will be ignored after first deployment"
 }
-
 
 variable "scheduling_strategy" {
   type        = string
@@ -80,6 +73,7 @@ variable "alb_deregistration_delay" {
   default     = 30
   description = "The amount time for Elastic Load Balancing to wait before changing the state of a deregistering target from draining to unused. The range is 0-3600 seconds. The default value is 300 seconds"
 }
+
 variable "alb_slow_start" {
   type        = number
   default     = 0
@@ -111,19 +105,18 @@ variable "health_checks" {
 
 variable "cron" {
   type = object({
-    settings         = any,
+    settings = list(object({
+      name                = string
+      args                = string
+      schedule_expression = string
+      desired_count       = optional(number, 1)
+    })),
     execution_script = string
   })
-  default = {
-    settings = [
-      #      name                = ""
-      #      execution_script    = ""
-      #      schedule_expression = ""
-      #      task_command        = []
-    ]
-    execution_script = ""
-  }
-  description = "schedule_expression = cron(0 20 * * ? *) or rate(5 minutes) // "
+
+  default     = null
+  nullable    = true
+  description = "Allows to set cron jobs using aws event bridge please check examples"
 }
 
 variable "worker_configuration" {
@@ -132,10 +125,8 @@ variable "worker_configuration" {
     execution_script = optional(string, "")
     args             = optional(string, "")
   })
-  default = {
-    execution_script = ""
-    args             = ""
-  }
+  default  = null
+  nullable = true
 }
 
 variable "alb_listener_arn" {
@@ -148,11 +139,7 @@ variable "vpc_id" {
 }
 
 variable "subnets" {
-  type = list(string)
-  #  validation {
-  #    condition =  var.ecs_settings.ecs_launch_type == "FARGATE" ? 1 : 0
-  #    error_message = "Fargate launch type requires subnets."
-  #  }
+  type    = list(string)
   default = []
 }
 
@@ -174,7 +161,9 @@ variable "aws_alb_listener_rule_conditions" {
   validation {
     condition = alltrue([
       for o in var.aws_alb_listener_rule_conditions : contains([
-        "host_header", "path_pattern", "source_ip"
+        "host_header",
+        "path_pattern",
+        "source_ip"
       ], o.type)
     ])
     error_message = "Type have to be host_header or path_pattern."
@@ -202,7 +191,6 @@ variable "service_policy" {
   description = "please use aws_iam_policy_document to define your policy"
   default     = ""
 }
-
 
 variable "network_lb" {
   type = object({

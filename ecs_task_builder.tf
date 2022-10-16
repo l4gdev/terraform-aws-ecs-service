@@ -8,15 +8,16 @@ locals {
       awslogs-stream-prefix = "ecs",
     }
   }
-    log_configuration_nginx = {
-        logDriver = "awslogs",
-        options = {
-            awslogs-group         = aws_cloudwatch_log_group.task_log_group_nginx.0.name,
-            awslogs-region        = data.aws_region.current.name,
-            awslogs-create-group  = "true",
-            awslogs-stream-prefix = "ecs",
-        }
+
+  log_configuration_nginx = {
+    logDriver = "awslogs",
+    options = {
+      awslogs-group         = aws_cloudwatch_log_group.task_log_group_nginx.0.name,
+      awslogs-region        = data.aws_region.current.name,
+      awslogs-create-group  = "true",
+      awslogs-stream-prefix = "ecs",
     }
+  }
 
   nginx_container_configuration = {
     name  = "nginx",
@@ -31,7 +32,7 @@ locals {
     links = [
       "${var.application_config.name}:app"
     ],
-      logConfiguration = local.log_configuration_nginx,
+    logConfiguration = local.log_configuration_nginx,
   }
 
   web_standard_container_configuration = {
@@ -71,7 +72,7 @@ locals {
     secrets          = local.secrets_mapped,
     essential        = true,
     image            = var.application_config.image,
-    command          = var.worker_configuration.execution_script != "" ? [var.worker_configuration.binary, var.worker_configuration.execution_script, var.worker_configuration.args] : []
+    command          = try(var.worker_configuration.execution_script, "") != "" ? [var.worker_configuration.binary, var.worker_configuration.execution_script, var.worker_configuration.args] : []
     logConfiguration = local.log_configuration,
     mountPoints      = var.volumes_mount_point
   }
