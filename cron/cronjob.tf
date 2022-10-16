@@ -6,7 +6,7 @@ locals {
 }
 
 resource "aws_cloudwatch_event_rule" "rule" {
-  name                = "${var.application_config.environment}-${var.application_config.name}-${replace(var.cron_settings.name, ":", "-")}"
+  name                = "${substr(var.application_config.environment,0,5)}-${var.application_config.name}-${replace(var.cron_settings.name, ":", "-")}"
   schedule_expression = var.cron_settings.schedule_expression
 }
 
