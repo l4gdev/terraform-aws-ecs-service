@@ -21,7 +21,7 @@ resource "aws_ecs_service" "service_worker" {
   }
 
   tags = merge(local.tags, {
-    Command = var.worker_configuration.args
+    Command = try(var.worker_configuration.args,"default")
     Type    = "worker"
   })
 
