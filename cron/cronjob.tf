@@ -1,12 +1,5 @@
-locals {
-  cron_execution_binary = {
-    NODE     = "node"
-    STANDARD = "node" #TODO fix it....
-  }
-}
-
 resource "aws_cloudwatch_event_rule" "rule" {
-  name                = "${substr(var.application_config.environment,0,5)}-${var.application_config.name}-${replace(var.cron_settings.name, ":", "-")}"
+  name                = "${substr(var.application_config.environment, 0, 5)}-${var.application_config.name}-${replace(var.cron_settings.name, ":", "-")}"
   schedule_expression = var.cron_settings.schedule_expression
 }
 
@@ -44,9 +37,7 @@ resource "aws_cloudwatch_event_target" "ecs_scheduled_task" {
     {
       containerOverrides = [
         {
-          command = concat([
-            local.cron_execution_binary[var.ecs_settings.lang], try(var.cron_settings.execution_script, "")
-          ], split(" ", var.cron_settings.args))
+          command = concat(try(var.cron_settings.execution_script, []) , split(" ", var.cron_settings.args))
           name = var.application_config.name
           logConfiguration = {
             options = {

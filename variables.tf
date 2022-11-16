@@ -111,7 +111,7 @@ variable "cron" {
       schedule_expression = string
       desired_count       = optional(number, 1)
     })),
-    execution_script = string
+    execution_script = list(string)
   })
 
   default     = null

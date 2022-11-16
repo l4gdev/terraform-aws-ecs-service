@@ -16,7 +16,7 @@ variable "cron_settings" {
     args                = string
     schedule_expression = string
     desired_count       = number
-    execution_script    = string
+    execution_script    = list(string)
   })
 }
 
