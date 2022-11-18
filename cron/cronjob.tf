@@ -37,16 +37,8 @@ resource "aws_cloudwatch_event_target" "ecs_scheduled_task" {
     {
       containerOverrides = [
         {
-          command = [join(" ",concat(try(var.cron_settings.execution_script, []) , split(" ", var.cron_settings.args)))]
-#          command = concat(try("${var.cron_settings.execution_script} ${var.cron_settings.args}", split(" ", var.cron_settings.args)))
-
-
-          name = var.application_config.name
-#          logConfiguration = {
-#            options = {
-#              awslogs-stream-prefix = "${var.application_config.name}-${replace(var.cron_settings.name, ":", "-")}",
-#            }
-#          }
+          command = [join(" ", concat(try(var.cron_settings.execution_script, []), split(" ", var.cron_settings.args)))]
+          name    = var.application_config.name
         }
       ]
     }

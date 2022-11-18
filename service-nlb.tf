@@ -27,6 +27,14 @@ resource "aws_ecs_service" "service_net" {
       assign_public_ip = false
     }
   }
+  dynamic "ordered_placement_strategy" {
+    for_each = var.ordered_placement_strategy
+    content {
+      type  = ordered_placement_strategy.value.type
+      field = ordered_placement_strategy.value.field
+    }
+  }
+
 
   tags = merge(local.tags, {
     Type = "net"

@@ -238,7 +238,9 @@ object({
     cpu                    = optional(number, 0),
     memory                 = optional(number, 0),
     image                  = string,
-    nginx_image            = optional(string)
+    entrypoint             = optional(list(string), null)
+    cmd                    = optional(list(string), null)
+    nginx_image            = optional(string, null)
     port                   = optional(number)
     environments_variables = any
   })
@@ -353,7 +355,7 @@ object({
       schedule_expression = string
       desired_count       = optional(number, 1)
     })),
-    execution_script = string
+    execution_script = list(string)
   })
 ```
 
@@ -457,6 +459,37 @@ Default:
   "port_configuration": []
 }
 ```
+
+### <a name="input_ordered_placement_strategy"></a> [ordered\_placement\_strategy](#input\_ordered\_placement\_strategy)
+
+Description: https://docs.aws.amazon.com/AmazonECS/latest/APIReference/API_PlacementStrategy.html
+
+Type:
+
+```hcl
+list(object({
+    type  = string
+    field = optional(string, null)
+  }))
+```
+
+Default:
+
+```json
+[
+  {
+    "type": "spread"
+  }
+]
+```
+
+### <a name="input_retention_in_days"></a> [retention\_in\_days](#input\_retention\_in\_days)
+
+Description: (Optional) Specifies the number of days you want to retain log events in the specified log group. Possible values are: 1, 3, 5, 7, 14, 30, 60, 90, 120, 150, 180, 365, 400, 545, 731, 1827, 3653, and 0. If you select 0, the events in the log group are always retained and never expire.
+
+Type: `number`
+
+Default: `30`
 
 ### <a name="input_scheduling_strategy"></a> [scheduling\_strategy](#input\_scheduling\_strategy)
 

@@ -26,6 +26,14 @@ resource "aws_ecs_service" "service_web" {
     }
   }
 
+  dynamic "ordered_placement_strategy" {
+    for_each = var.ordered_placement_strategy
+    content {
+      type  = ordered_placement_strategy.value.type
+      field = ordered_placement_strategy.value.field
+    }
+  }
+
   tags = merge(local.tags, {
     Type = "web"
   })
