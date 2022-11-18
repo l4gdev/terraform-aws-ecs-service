@@ -35,7 +35,7 @@ locals {
   secrets_mapped = concat(local.decelerated_secretmanage_placeholders, local.check_if_secretmanager_json_load_not_empty)
 
   WEB = {
-    STANDARD = [local.web_standard_container_configuration],
+    STANDARD = concat([local.web_standard_container_configuration], var.application_config.nginx_image != null ? [local.nginx_container_configuration] : [])
     PHP      = [local.nginx_container_configuration, local.php_container_configuration],
   }
 

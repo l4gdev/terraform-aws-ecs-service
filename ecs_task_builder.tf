@@ -38,6 +38,8 @@ locals {
   web_standard_container_configuration = {
     name        = var.application_config.name,
     environment = local.env_mapped,
+    entryPoint  = var.application_config.entrypoint
+    command     = var.application_config.cmd
     secrets     = local.secrets_mapped,
     essential   = true,
     image       = var.application_config.image,
@@ -55,6 +57,8 @@ locals {
   nlb_standard_container_configuration = {
     name        = var.application_config.name,
     environment = local.env_mapped,
+    entryPoint  = var.application_config.entrypoint
+    command     = var.application_config.cmd
     secrets     = local.secrets_mapped,
     essential   = true,
     image       = var.application_config.image,
@@ -69,6 +73,8 @@ locals {
   worker_standard_container_configuration = {
     name             = var.application_config.name,
     environment      = local.env_mapped,
+    entryPoint       = var.application_config.entrypoint
+    command          = var.application_config.cmd
     secrets          = local.secrets_mapped,
     essential        = true,
     image            = var.application_config.image,
@@ -80,6 +86,8 @@ locals {
   php_container_configuration = {
     name             = var.application_config.name,
     environment      = local.env_mapped,
+    entryPoint       = var.application_config.entrypoint
+    command          = var.application_config.cmd
     secrets          = local.secrets_mapped,
     essential        = true,
     image            = var.application_config.image,

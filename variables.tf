@@ -62,7 +62,9 @@ variable "application_config" {
     cpu                    = optional(number, 0),
     memory                 = optional(number, 0),
     image                  = string,
-    nginx_image            = optional(string)
+    entrypoint             = optional(list(string), null)
+    cmd                    = optional(list(string), null)
+    nginx_image            = optional(string, null)
     port                   = optional(number)
     environments_variables = any
   })
