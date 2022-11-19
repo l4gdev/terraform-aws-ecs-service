@@ -12,7 +12,7 @@ locals {
   log_configuration_nginx = {
     logDriver = "awslogs",
     options = {
-      awslogs-group         = aws_cloudwatch_log_group.task_log_group_nginx.0.name,
+      awslogs-group         = try(aws_cloudwatch_log_group.task_log_group_nginx.0.name,""),
       awslogs-region        = data.aws_region.current.name,
       awslogs-create-group  = "true",
       awslogs-stream-prefix = "ecs",
