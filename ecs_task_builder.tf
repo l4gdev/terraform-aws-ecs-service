@@ -74,11 +74,10 @@ locals {
     name             = var.application_config.name,
     environment      = local.env_mapped,
     entryPoint       = var.application_config.entrypoint
-    command          = var.application_config.cmd
     secrets          = local.secrets_mapped,
     essential        = true,
     image            = var.application_config.image,
-    command          = try(var.worker_configuration.execution_script, "") != "" ? [var.worker_configuration.binary, var.worker_configuration.execution_script, var.worker_configuration.args] : []
+    command          = try(var.worker_configuration.execution_script, "") != "" ? [var.worker_configuration.binary, var.worker_configuration.execution_script, var.worker_configuration.args] : try(var.application_config.cmd, [])
     logConfiguration = local.log_configuration,
     mountPoints      = var.volumes_mount_point
   }

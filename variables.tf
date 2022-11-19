@@ -236,6 +236,8 @@ variable "ordered_placement_strategy" {
   }))
   default = [{
     type = "spread"
+    field = "attribute:ecs.availability-zone"
+
   }]
   description = "https://docs.aws.amazon.com/AmazonECS/latest/APIReference/API_PlacementStrategy.html"
 }
