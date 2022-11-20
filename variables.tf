@@ -188,6 +188,19 @@ variable "list_of_secrets_in_secrets_manager_to_load" {
   default = []
 }
 
+variable "store_secrets_at_s3" {
+  type = object({
+    enable             = bool
+    bucket_name        = string
+    prefix_name        = optional(string,"")
+  })
+  default = {
+    enable             = false
+    bucket_name        = ""
+    prefix_name        = ""
+  }
+}
+
 variable "service_policy" {
   type        = string
   description = "please use aws_iam_policy_document to define your policy"
@@ -235,7 +248,7 @@ variable "ordered_placement_strategy" {
     field = optional(string, null)
   }))
   default = [{
-    type = "spread"
+    type  = "spread"
     field = "attribute:ecs.availability-zone"
 
   }]
