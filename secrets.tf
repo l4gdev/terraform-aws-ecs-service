@@ -23,6 +23,10 @@ resource "aws_s3_object" "secrets" {
   source_hash            = md5(tostring(join("\n", local.files)))
   server_side_encryption = "aws:kms"
   depends_on             = [local_file.secrets]
+
+  provisioner "local-exec" {
+    command = "rm ${local_file.secrets[0].filename}"
+  }
 }
 
 resource "local_file" "secrets" {
