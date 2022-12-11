@@ -36,8 +36,8 @@ resource "local_file" "secrets" {
 }
 
 locals {
-  files = flatten([
+  files = sensitive(flatten([
     for k, v in data.aws_secretsmanager_secret_version.secrets :
     [for secret_name, value in nonsensitive(jsondecode(v.secret_string)) : "${secret_name}=${value}"]
-  ])
+  ]))
 }
