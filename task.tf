@@ -1,7 +1,7 @@
 resource "aws_ecs_task_definition" "service" {
   family                   = "${var.application_config.environment}-${var.application_config.name}"
   execution_role_arn       = aws_iam_role.ecs-execution.arn
-  network_mode             = var.ecs_settings.ecs_launch_type == "FARGATE" ? "awsvpc" : "bridge"
+  network_mode             = var.network_mode == null ? var.ecs_settings.ecs_launch_type == "FARGATE" ? "awsvpc" : "bridge" : var.network_mode
   requires_compatibilities = [var.ecs_settings.ecs_launch_type]
   cpu                      = var.application_config.cpu == 0 ? "" : var.application_config.cpu
   memory                   = var.application_config.memory
@@ -11,7 +11,8 @@ resource "aws_ecs_task_definition" "service" {
   dynamic "volume" {
     for_each = var.volumes
     content {
-      name = volume.value.name
+      name      = volume.value.name
+      host_path = try(volume.value.host_path, null)
       dynamic "efs_volume_configuration" {
         for_each = can(volume.value["efs_volume_configuration"]) ? [volume.value.efs_volume_configuration] : []
         content {

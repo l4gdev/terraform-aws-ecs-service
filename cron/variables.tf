@@ -3,7 +3,7 @@ variable "task_definition_arn" {
 }
 
 variable "ecs_settings" {
-
+  type = any
 }
 
 variable "iam_role_arn" {
@@ -32,14 +32,16 @@ variable "application_config" {
   })
 }
 
-variable "tags" {}
+variable "tags" {
+  type = any
+}
 variable "launch_type" {
-
+  type = any
 }
 
 variable "subnets" {
-  default = ""
+  type = list(string)
 }
 variable "security_groups" {
-  default = ""
+  type = list(string)
 }

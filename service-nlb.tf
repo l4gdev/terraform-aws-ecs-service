@@ -20,7 +20,7 @@ resource "aws_ecs_service" "service_net" {
     }
   }
   dynamic "network_configuration" {
-    for_each = var.ecs_settings.ecs_launch_type == "FARGATE" ? [1] : []
+    for_each = aws_ecs_task_definition.service.network_mode != "bridge" || var.ecs_settings.ecs_launch_type == "FARGATE" ? [1] : []
     content {
       subnets          = var.subnets
       security_groups  = var.security_groups
@@ -32,6 +32,14 @@ resource "aws_ecs_service" "service_net" {
     content {
       type  = ordered_placement_strategy.value.type
       field = ordered_placement_strategy.value.field
+    }
+  }
+
+  dynamic "placement_constraints" {
+    for_each = var.placement_constraints
+    content {
+      type       = placement_constraints.value.type
+      expression = placement_constraints.value.expression
     }
   }
 

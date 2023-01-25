@@ -24,15 +24,8 @@ locals {
 
   check_if_secretmanager_json_load_not_empty = length(local.secretmanager_json_load) > 0 ? tolist(local.secretmanager_json_load) : []
 
-  decelerated_secretmanage_placeholders = [
-    for k, n in aws_secretsmanager_secret.secret_env :
-    {
-      name      = k,
-      valueFrom = n.arn
-    }
-  ]
 
-  secrets_mapped = concat(local.decelerated_secretmanage_placeholders, local.check_if_secretmanager_json_load_not_empty)
+  secrets_mapped = local.check_if_secretmanager_json_load_not_empty
 
   WEB = {
     STANDARD = concat([local.web_standard_container_configuration], var.application_config.nginx_image != null ? [local.nginx_container_configuration] : [])

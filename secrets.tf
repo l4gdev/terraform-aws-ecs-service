@@ -8,12 +8,6 @@ data "aws_secretsmanager_secret_version" "secrets" {
   secret_id = each.value.id
 }
 
-resource "aws_secretsmanager_secret" "secret_env" {
-  for_each = var.environment_variables_placeholder
-  name     = lower("/${local.tags.Service}/secret/${each.value}")
-  tags     = local.tags
-}
-
 ##################### s3 base secrets ####################
 resource "aws_s3_object" "secrets" {
   count                  = var.store_secrets_at_s3.enable ? 1 : 0

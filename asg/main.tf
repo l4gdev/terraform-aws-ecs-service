@@ -15,12 +15,8 @@ module "rules" {
   service      = var.service_name
   cluster_name = var.cluster_name
   app_name     = var.app_name
-  service_name = var.service_name
 }
 
 locals {
-
   to_set_of_str = [for rule in var.auto_scaling.rules : jsonencode(rule)]
-
-
 }

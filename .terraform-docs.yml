@@ -1,0 +1,4 @@
+formatter: "markdown document"
+sort:
+  enabled: true
+  by: name

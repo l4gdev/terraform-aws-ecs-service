@@ -103,6 +103,7 @@ variable "health_checks" {
       unhealthy_threshold = 5
     }
   ]
+  description = "Health check configuration for the service."
 }
 
 variable "cron" {
@@ -127,27 +128,39 @@ variable "worker_configuration" {
     execution_script = optional(string, "")
     args             = optional(string, "")
   })
-  default  = null
-  nullable = true
+  default     = null
+  nullable    = true
+  description = "Allows to set worker configuration"
 }
 
 variable "alb_listener_arn" {
-  type    = string
-  default = ""
+  type        = string
+  default     = ""
+  description = "The ARN of the listener to which to attach the routing rule."
+}
+
+variable "network_mode" {
+  type        = string
+  default     = null
+  nullable    = true
+  description = "The network mode to use for the tasks. The valid values are awsvpc, bridge, host, and none. If no network mode is specified, the default is bridge."
 }
 
 variable "vpc_id" {
-  type = string
+  type        = string
+  description = "The ID of the VPC."
 }
 
 variable "subnets" {
-  type    = list(string)
-  default = []
+  type        = list(string)
+  default     = []
+  description = "Setting requires network_mode to be set to awsvpc."
 }
 
 variable "security_groups" {
-  type    = list(string)
-  default = []
+  type        = list(string)
+  default     = []
+  description = "Setting requires network_mode to be set to awsvpc."
 }
 
 variable "aws_alb_listener_rule_conditions" {
@@ -173,32 +186,30 @@ variable "aws_alb_listener_rule_conditions" {
 }
 
 variable "tags" {
-  type    = map(string)
-  default = {}
-}
-
-variable "environment_variables_placeholder" {
-  type        = set(string)
-  default     = []
-  description = "List of names of secret envs for example [\"MYSQL_PASSWORD\"]. That module will create placeholders at AWS secret manager that you will have to fulfil. the list of ARNs is available at output."
+  type        = map(string)
+  default     = {}
+  description = "A mapping of tags to assign to the resource."
 }
 
 variable "list_of_secrets_in_secrets_manager_to_load" {
-  type    = set(string)
-  default = []
+  type        = set(string)
+  default     = []
+  description = "List of names of secret manager secrets to load by theirs name. Module will load all secrets from secret manager and put them to envs."
 }
 
 variable "store_secrets_at_s3" {
+
   type = object({
-    enable             = bool
-    bucket_name        = string
-    prefix_name        = optional(string,"")
+    enable      = bool
+    bucket_name = string
+    prefix_name = optional(string, "")
   })
   default = {
-    enable             = false
-    bucket_name        = ""
-    prefix_name        = ""
+    enable      = false
+    bucket_name = ""
+    prefix_name = ""
   }
+  description = "Store secrets at s3 bucket, i dont recommend this option"
 }
 
 variable "service_policy" {
@@ -219,11 +230,13 @@ variable "network_lb" {
     nlb_arn            = "",
     port_configuration = []
   }
+  description = "Network load balancer configuration"
 }
 
 variable "volumes" {
-  type    = list(any)
-  default = []
+  type        = list(any)
+  default     = []
+  description = "Volumes to attach to the container. This parameter maps to Volumes in the Create a container section of the Docker Remote API and the --volume option to docker run.  List of maps with keys: name, host_path, container_path, read_only"
 }
 
 variable "volumes_mount_point" {
@@ -232,7 +245,8 @@ variable "volumes_mount_point" {
     containerPath = string
     readOnly      = bool
   }))
-  default = []
+  default     = []
+  description = "Volumes mount point at host"
 }
 
 variable "retention_in_days" {
@@ -240,7 +254,6 @@ variable "retention_in_days" {
   default     = 30
   description = "(Optional) Specifies the number of days you want to retain log events in the specified log group. Possible values are: 1, 3, 5, 7, 14, 30, 60, 90, 120, 150, 180, 365, 400, 545, 731, 1827, 3653, and 0. If you select 0, the events in the log group are always retained and never expire."
 }
-
 
 variable "ordered_placement_strategy" {
   type = list(object({
@@ -253,4 +266,13 @@ variable "ordered_placement_strategy" {
 
   }]
   description = "https://docs.aws.amazon.com/AmazonECS/latest/APIReference/API_PlacementStrategy.html"
+}
+
+variable "placement_constraints" {
+  type = list(object({
+    type       = string
+    expression = string
+  }))
+  default     = []
+  description = "Placement constraints for the task"
 }

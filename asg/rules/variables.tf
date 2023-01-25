@@ -17,6 +17,3 @@ variable "app_name" {
 variable "cluster_name" {
   type = string
 }
-variable "service_name" {
-  type = string
-}

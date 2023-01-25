@@ -164,7 +164,7 @@ module "asset-workers" {
   service_policy  = data.aws_iam_policy_document.app_policy.json
 }
 ```
-
+<!-- BEGINNING OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
 ## Requirements
 
 The following requirements are needed by this module:
@@ -176,6 +176,8 @@ The following requirements are needed by this module:
 The following providers are used by this module:
 
 - <a name="provider_aws"></a> [aws](#provider\_aws)
+
+- <a name="provider_local"></a> [local](#provider\_local)
 
 ## Modules
 
@@ -207,6 +209,7 @@ The following resources are used by this module:
 - [aws_iam_role.ecs_events](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role) (resource)
 - [aws_iam_role.service](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role) (resource)
 - [aws_iam_role_policy.ecs_events_run_task_with_any_role](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role_policy) (resource)
+- [aws_iam_role_policy.get_s3_envs](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role_policy) (resource)
 - [aws_iam_role_policy.service](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role_policy) (resource)
 - [aws_iam_role_policy.ssm_access](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role_policy) (resource)
 - [aws_iam_role_policy_attachment.ecs-execution](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role_policy_attachment) (resource)
@@ -214,8 +217,8 @@ The following resources are used by this module:
 - [aws_lb_listener_rule.web-app](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/lb_listener_rule) (resource)
 - [aws_lb_target_group.app](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/lb_target_group) (resource)
 - [aws_lb_target_group.network_lb_target](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/lb_target_group) (resource)
-- [aws_secretsmanager_secret.secret_env](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/secretsmanager_secret) (resource)
-- [aws_caller_identity.current](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/caller_identity) (data source)
+- [aws_s3_object.secrets](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/s3_object) (resource)
+- [local_file.secrets](https://registry.terraform.io/providers/hashicorp/local/latest/docs/resources/file) (resource)
 - [aws_iam_policy_document.placeholder](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/iam_policy_document) (data source)
 - [aws_region.current](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/region) (data source)
 - [aws_secretsmanager_secret.secrets](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/secretsmanager_secret) (data source)
@@ -294,7 +297,7 @@ object({
 
 ### <a name="input_vpc_id"></a> [vpc\_id](#input\_vpc\_id)
 
-Description: n/a
+Description: The ID of the VPC.
 
 Type: `string`
 
@@ -312,7 +315,7 @@ Default: `30`
 
 ### <a name="input_alb_listener_arn"></a> [alb\_listener\_arn](#input\_alb\_listener\_arn)
 
-Description: n/a
+Description: The ARN of the listener to which to attach the routing rule.
 
 Type: `string`
 
@@ -361,14 +364,6 @@ object({
 
 Default: `null`
 
-### <a name="input_environment_variables_placeholder"></a> [environment\_variables\_placeholder](#input\_environment\_variables\_placeholder)
-
-Description: List of names of secret envs for example ["MYSQL\_PASSWORD"]. That module will create placeholders at AWS secret manager that you will have to fulfil. the list of ARNs is available at output.
-
-Type: `set(string)`
-
-Default: `[]`
-
 ### <a name="input_fargate_datadog_sidecar_parameters"></a> [fargate\_datadog\_sidecar\_parameters](#input\_fargate\_datadog\_sidecar\_parameters)
 
 Description: n/a
@@ -395,7 +390,7 @@ Default:
 
 ### <a name="input_health_checks"></a> [health\_checks](#input\_health\_checks)
 
-Description: n/a
+Description: Health check configuration for the service.
 
 Type:
 
@@ -429,7 +424,7 @@ Default:
 
 ### <a name="input_list_of_secrets_in_secrets_manager_to_load"></a> [list\_of\_secrets\_in\_secrets\_manager\_to\_load](#input\_list\_of\_secrets\_in\_secrets\_manager\_to\_load)
 
-Description: n/a
+Description: List of names of secret manager secrets to load by theirs name. Module will load all secrets from secret manager and put them to envs.
 
 Type: `set(string)`
 
@@ -437,7 +432,7 @@ Default: `[]`
 
 ### <a name="input_network_lb"></a> [network\_lb](#input\_network\_lb)
 
-Description: n/a
+Description: Network load balancer configuration
 
 Type:
 
@@ -460,6 +455,14 @@ Default:
 }
 ```
 
+### <a name="input_network_mode"></a> [network\_mode](#input\_network\_mode)
+
+Description: The network mode to use for the tasks. The valid values are awsvpc, bridge, host, and none. If no network mode is specified, the default is bridge.
+
+Type: `string`
+
+Default: `null`
+
 ### <a name="input_ordered_placement_strategy"></a> [ordered\_placement\_strategy](#input\_ordered\_placement\_strategy)
 
 Description: https://docs.aws.amazon.com/AmazonECS/latest/APIReference/API_PlacementStrategy.html
@@ -478,10 +481,26 @@ Default:
 ```json
 [
   {
+    "field": "attribute:ecs.availability-zone",
     "type": "spread"
   }
 ]
 ```
+
+### <a name="input_placement_constraints"></a> [placement\_constraints](#input\_placement\_constraints)
+
+Description: Placement constraints for the task
+
+Type:
+
+```hcl
+list(object({
+    type       = string
+    expression = string
+  }))
+```
+
+Default: `[]`
 
 ### <a name="input_retention_in_days"></a> [retention\_in\_days](#input\_retention\_in\_days)
 
@@ -501,7 +520,7 @@ Default: `"REPLICA"`
 
 ### <a name="input_security_groups"></a> [security\_groups](#input\_security\_groups)
 
-Description: n/a
+Description: Setting requires network\_mode to be set to awsvpc.
 
 Type: `list(string)`
 
@@ -515,9 +534,33 @@ Type: `string`
 
 Default: `""`
 
+### <a name="input_store_secrets_at_s3"></a> [store\_secrets\_at\_s3](#input\_store\_secrets\_at\_s3)
+
+Description: Store secrets at s3 bucket, i dont recommend this option
+
+Type:
+
+```hcl
+object({
+    enable      = bool
+    bucket_name = string
+    prefix_name = optional(string, "")
+  })
+```
+
+Default:
+
+```json
+{
+  "bucket_name": "",
+  "enable": false,
+  "prefix_name": ""
+}
+```
+
 ### <a name="input_subnets"></a> [subnets](#input\_subnets)
 
-Description: n/a
+Description: Setting requires network\_mode to be set to awsvpc.
 
 Type: `list(string)`
 
@@ -525,7 +568,7 @@ Default: `[]`
 
 ### <a name="input_tags"></a> [tags](#input\_tags)
 
-Description: n/a
+Description: A mapping of tags to assign to the resource.
 
 Type: `map(string)`
 
@@ -533,7 +576,7 @@ Default: `{}`
 
 ### <a name="input_volumes"></a> [volumes](#input\_volumes)
 
-Description: n/a
+Description: Volumes to attach to the container. This parameter maps to Volumes in the Create a container section of the Docker Remote API and the --volume option to docker run.  List of maps with keys: name, host\_path, container\_path, read\_only
 
 Type: `list(any)`
 
@@ -541,7 +584,7 @@ Default: `[]`
 
 ### <a name="input_volumes_mount_point"></a> [volumes\_mount\_point](#input\_volumes\_mount\_point)
 
-Description: n/a
+Description: Volumes mount point at host
 
 Type:
 
@@ -557,7 +600,7 @@ Default: `[]`
 
 ### <a name="input_worker_configuration"></a> [worker\_configuration](#input\_worker\_configuration)
 
-Description: n/a
+Description: Allows to set worker configuration
 
 Type:
 
@@ -575,6 +618,10 @@ Default: `null`
 
 The following outputs are exported:
 
+### <a name="output_s3_secrets"></a> [s3\_secrets](#output\_s3\_secrets)
+
+Description: n/a
+
 ### <a name="output_task_iam_role_arn"></a> [task\_iam\_role\_arn](#output\_task\_iam\_role\_arn)
 
 Description: n/a
@@ -582,3 +629,4 @@ Description: n/a
 ### <a name="output_task_iam_role_name"></a> [task\_iam\_role\_name](#output\_task\_iam\_role\_name)
 
 Description: n/a
+<!-- END OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
