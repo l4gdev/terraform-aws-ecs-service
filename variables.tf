@@ -139,6 +139,12 @@ variable "alb_listener_arn" {
   description = "The ARN of the listener to which to attach the routing rule."
 }
 
+variable "use_static_port_on_ec2" {
+  type        = bool
+  default     = false
+  description = "If set to true, the service will use the random port on the EC2 instances."
+}
+
 variable "network_mode" {
   type        = string
   default     = null

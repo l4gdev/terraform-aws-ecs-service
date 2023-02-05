@@ -17,7 +17,7 @@ locals {
     portMappings = [
       {
         containerPort = var.application_config.port,
-        hostPort      = 0,
+        hostPort      = var.use_static_port_on_ec2 ? var.application_config.port : 0,
         protocol      = "tcp"
       }
     ]
