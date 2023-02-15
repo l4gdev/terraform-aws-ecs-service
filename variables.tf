@@ -3,7 +3,6 @@ variable "ecs_settings" {
     ecs_launch_type  = string,
     ecs_cluster_name = string,
     run_type         = string,
-    lang             = string,
   })
   validation {
     condition     = contains(["FARGATE", "EC2"], var.ecs_settings.ecs_launch_type)
@@ -12,10 +11,6 @@ variable "ecs_settings" {
   validation {
     condition     = contains(["WEB", "WORKER", "CRON", "NLB"], var.ecs_settings.run_type)
     error_message = "Run type can be WEB, WORKER, CRON, NLB."
-  }
-  validation {
-    condition     = contains(["PHP", "STANDARD"], var.ecs_settings.lang)
-    error_message = "Lang can be set to PHP or STANDARD."
   }
 }
 
@@ -64,11 +59,35 @@ variable "application_config" {
     image                  = string,
     entrypoint             = optional(list(string), null)
     cmd                    = optional(list(string), null)
-    nginx_image            = optional(string, null)
     port                   = optional(number)
     environments_variables = any
   })
 }
+
+variable "web_server" {
+  type = object({
+    enabled        = bool
+    name           = optional(string, "nginx")
+    container_port = optional(number, 80)
+    host_port      = optional(number, 0)
+    image          = optional(string, "nginx:latest")
+    command        = optional(list(string), null)
+    entrypoint     = optional(list(string), null)
+  })
+  default = {
+    enabled = false
+  }
+}
+
+variable "docker_labels" {
+  type = list(object({
+    container_name = string
+    labels         = optional(map(string), {})
+  }))
+  description = "Docker labels to be added to the container. The labels map is a set of key/value pairs. Application container is named var.application_config.name .To add labels to webserver you have to set container_name to webserver name for example nginx."
+  default     = []
+}
+
 
 variable "alb_deregistration_delay" {
   type        = number

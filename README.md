@@ -200,7 +200,7 @@ Version:
 The following resources are used by this module:
 
 - [aws_cloudwatch_log_group.task_log_group](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/cloudwatch_log_group) (resource)
-- [aws_cloudwatch_log_group.task_log_group_nginx](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/cloudwatch_log_group) (resource)
+- [aws_cloudwatch_log_group.task_log_group_webserver](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/cloudwatch_log_group) (resource)
 - [aws_ecs_service.service_net](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/ecs_service) (resource)
 - [aws_ecs_service.service_web](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/ecs_service) (resource)
 - [aws_ecs_service.service_worker](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/ecs_service) (resource)
@@ -243,7 +243,6 @@ object({
     image                  = string,
     entrypoint             = optional(list(string), null)
     cmd                    = optional(list(string), null)
-    nginx_image            = optional(string, null)
     port                   = optional(number)
     environments_variables = any
   })
@@ -291,7 +290,6 @@ object({
     ecs_launch_type  = string,
     ecs_cluster_name = string,
     run_type         = string,
-    lang             = string,
   })
 ```
 
@@ -363,6 +361,21 @@ object({
 ```
 
 Default: `null`
+
+### <a name="input_docker_labels"></a> [docker\_labels](#input\_docker\_labels)
+
+Description: Docker labels to be added to the container. The labels map is a set of key/value pairs. Application container is named var.application\_config.name .To add labels to webserver you have to set container\_name to webserver name for example nginx.
+
+Type:
+
+```hcl
+list(object({
+    container_name = string
+    labels         = optional(map(string), {})
+  }))
+```
+
+Default: `[]`
 
 ### <a name="input_fargate_datadog_sidecar_parameters"></a> [fargate\_datadog\_sidecar\_parameters](#input\_fargate\_datadog\_sidecar\_parameters)
 
@@ -574,6 +587,14 @@ Type: `map(string)`
 
 Default: `{}`
 
+### <a name="input_use_static_port_on_ec2"></a> [use\_static\_port\_on\_ec2](#input\_use\_static\_port\_on\_ec2)
+
+Description: If set to true, the service will use the random port on the EC2 instances.
+
+Type: `bool`
+
+Default: `false`
+
 ### <a name="input_volumes"></a> [volumes](#input\_volumes)
 
 Description: Volumes to attach to the container. This parameter maps to Volumes in the Create a container section of the Docker Remote API and the --volume option to docker run.  List of maps with keys: name, host\_path, container\_path, read\_only
@@ -597,6 +618,32 @@ list(object({
 ```
 
 Default: `[]`
+
+### <a name="input_web_server"></a> [web\_server](#input\_web\_server)
+
+Description: n/a
+
+Type:
+
+```hcl
+object({
+    enabled        = bool
+    name           = optional(string, "nginx")
+    container_port = optional(number, 80)
+    host_port      = optional(number, 0)
+    image          = optional(string, "nginx:latest")
+    command        = optional(list(string), null)
+    entrypoint     = optional(list(string), null)
+  })
+```
+
+Default:
+
+```json
+{
+  "enabled": false
+}
+```
 
 ### <a name="input_worker_configuration"></a> [worker\_configuration](#input\_worker\_configuration)
 

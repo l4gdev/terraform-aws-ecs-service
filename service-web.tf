@@ -13,8 +13,8 @@ resource "aws_ecs_service" "service_web" {
 
   load_balancer {
     target_group_arn = aws_lb_target_group.app[0].arn
-    container_name   = var.ecs_settings.lang == "PHP" ? "nginx" : var.application_config.name
-    container_port   = var.ecs_settings.lang == "PHP" ? 80 : var.application_config.port
+    container_name   = var.web_server.enabled ? var.web_server.name : var.application_config.name
+    container_port   = var.web_server.enabled ? var.web_server.container_port : var.application_config.port
   }
 
   dynamic "network_configuration" {

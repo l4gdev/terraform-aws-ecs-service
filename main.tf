@@ -27,19 +27,9 @@ locals {
 
   secrets_mapped = local.check_if_secretmanager_json_load_not_empty
 
-  WEB = {
-    STANDARD = concat([local.web_standard_container_configuration], var.application_config.nginx_image != null ? [local.nginx_container_configuration] : [])
-    PHP      = [local.nginx_container_configuration, local.php_container_configuration],
-  }
-
-  NLB = {
-    STANDARD = [local.nlb_standard_container_configuration],
-    PHP      = [local.nginx_container_configuration, local.php_container_configuration],
-  }
-
   task_app_configuration = {
-    WEB    = local.WEB[var.ecs_settings.lang],
-    NLB    = local.NLB[var.ecs_settings.lang],
+    WEB    = concat([local.web_standard_container_configuration], var.web_server.enabled == true ? [local.webserver_container_configuration] : [])
+    NLB    = concat([local.nlb_standard_container_configuration], var.web_server.enabled == true ? [local.webserver_container_configuration] : [])
     WORKER = [local.worker_standard_container_configuration],
     CRON   = [local.worker_standard_container_configuration],
   }

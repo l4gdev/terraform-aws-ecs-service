@@ -1,4 +1,7 @@
+
 locals {
+  docker_labels_remap = { for v in var.docker_labels : v.container_name => v.labels }
+
   common_task_variables = {
     essential        = true
     name             = var.application_config.name,
@@ -10,6 +13,7 @@ locals {
     image            = var.application_config.image
     mountPoints      = var.volumes_mount_point
     logConfiguration = local.log_configuration
+    dockerLabels     = try(local.docker_labels_remap[var.application_config.name], {})
   }
 
   ######################### APP ##########################
@@ -35,8 +39,6 @@ locals {
     command = try(var.worker_configuration.execution_script, "") != "" ? [var.worker_configuration.binary, var.worker_configuration.execution_script, var.worker_configuration.args] : try(var.application_config.cmd, [])
   })
 
-  php_container_configuration = merge(local.common_task_variables, {})
-
   #################### LOG ##########################
   log_configuration = {
     logDriver = "awslogs",
@@ -48,28 +50,31 @@ locals {
     }
   }
 
-  log_configuration_nginx = {
+  log_configuration_webserver = {
     logDriver = "awslogs",
     options = {
-      awslogs-group         = try(aws_cloudwatch_log_group.task_log_group_nginx[0].name, ""),
+      awslogs-group         = try(aws_cloudwatch_log_group.task_log_group_webserver[0].name, ""),
       awslogs-region        = data.aws_region.current.name,
       awslogs-create-group  = "true",
       awslogs-stream-prefix = "ecs",
     }
   }
   ######################### SIDECAR ##########################
-  nginx_container_configuration = {
-    name  = "nginx",
-    image = var.application_config.nginx_image != null ? var.application_config.nginx_image : "nginx:latest"
+  webserver_container_configuration = {
+    name  = var.web_server.name,
+    image = var.web_server.image,
     portMappings = [
       {
-        containerPort = 80,
-        hostPort      = 0,
+        containerPort = var.web_server.container_port,
+        hostPort      = var.use_static_port_on_ec2 ? var.web_server.host_port : 0,
         protocol      = "tcp"
       }
     ],
-    links            = ["${var.application_config.name}:app"],
-    logConfiguration = local.log_configuration_nginx,
+    links            = ["${var.application_config.name}:${var.application_config.name}"],
+    logConfiguration = local.log_configuration_webserver,
+    dockerLabels     = try(local.docker_labels_remap[var.web_server.name], {})
+    command          = try(var.web_server.command, null)
+    entryPoint       = try(var.web_server.entrypoint, null)
   }
 
   datadog_fargate_sidecar = {
