@@ -1,17 +1,16 @@
 # L4G ECS module
-<img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI1Ny45NTIiIGhlaWdodD0iMzIiIHZpZXdCb3g9IjAgMCA1Ny45NTIgMzIiPgogIDxnIGlkPSJHcm91cF81IiBkYXRhLW5hbWU9Ikdyb3VwIDUiIHRyYW5zZm9ybT0idHJhbnNsYXRlKC0yMDg1Ljk4NiAtMTgxMi45KSI+CiAgICA8cGF0aCBpZD0iUGF0aF82MyIgZGF0YS1uYW1lPSJQYXRoIDYzIiBkPSJNMjEwNi4xODMsMTgxMi45bC03LjYxOCwxNi4wOGgtNS44NzFsNy40ODUtMTYuMDhaIiBmaWxsPSIjZjFmMWY2Ii8+CiAgICA8cGF0aCBpZD0iUGF0aF82NCIgZGF0YS1uYW1lPSJQYXRoIDY0IiBkPSJNMjExMS4xNTUsMTgzOS4zMDd2NS41OTNoLTI1LjE2OWw3LjQ4Ni0xNi4wOGg1Ljg3MWwtNC45NjcsMTAuNDg3WiIgZmlsbD0iI2YxZjFmNiIvPgogICAgPHBhdGggaWQ9IlBhdGhfNjUiIGRhdGEtbmFtZT0iUGF0aCA2NSIgZD0iTTIxNDMuOTM3LDE4MjQuMDg2bC00LjIsNC44OTRoLTEyLjU4NHYtNC44OTRaIiBmaWxsPSIjZjFmMWY2Ii8+CiAgICA8cGF0aCBpZD0iUGF0aF82NiIgZGF0YS1uYW1lPSJQYXRoIDY2IiBkPSJNMjEzOS4xMjEsMTgzOS4zMDdoLTYuOTkxbDQuMTk1LTUuNTkzLDIuOC0zLjI2M1oiIGZpbGw9IiNmMWYxZjYiLz4KICAgIDxwYXRoIGlkPSJQYXRoXzY3IiBkYXRhLW5hbWU9IlBhdGggNjciIGQ9Ik0yMTQwLjUxOSwxODI4LjgybC0xLjQsMS42MzF2LS45MzJoLTUuNTkzdjQuMTk1aC01LjU5M3YtNC44OTRaIiBmaWxsPSIjZjFmMWY2Ii8+CiAgICA8cGF0aCBpZD0iUGF0aF82OCIgZGF0YS1uYW1lPSJQYXRoIDY4IiBkPSJNMjE0My45MzcsMTgxMi45djUuNTkzaC0yMi4zNzN2MTAuNDg3aC01LjU5M1YxODEyLjlaIiBmaWxsPSIjZjFmMWY2Ii8+CiAgICA8cGF0aCBpZD0iUGF0aF82OSIgZGF0YS1uYW1lPSJQYXRoIDY5IiBkPSJNMjEzMi4xMjksMTgzOS4zMDdsLTQuMiw1LjU5M2gtMTEuMTg2di01LjU5M2gyLjh2LTUuNTkzaC0yLjh2LTQuODk0aDUuNTkzdjEwLjQ4N1oiIGZpbGw9IiNmMWYxZjYiLz4KICAgIDxwYXRoIGlkPSJQYXRoXzcwIiBkYXRhLW5hbWU9IlBhdGggNzAiIGQ9Ik0yMTEwLjM3OCwxODE0LjN2MTQuNjgyaC02LjI5MloiIGZpbGw9IiNhMjAwMjkiLz4KICAgIDxwYXRoIGlkPSJQYXRoXzcxIiBkYXRhLW5hbWU9IlBhdGggNzEiIGQ9Ik0yMTExLjE1NSwxODI4LjgydjQuODk0aC04LjM5bDIuMS00Ljg5NFoiIGZpbGw9IiNhMjAwMjkiLz4KICA8L2c+Cjwvc3ZnPgo=" alt="L4G">
 
 ## Supported features 
-1. Web server apps with ALB
-   1. automatic ALB listener rules registrations.
-2. TCP/UDP servers with NLB
-3. Workers.
-4. Cron jobs.
-5. EC2 or FARGATE launch type.
-6. Autoscaling
-7. Volume mounts
-8. Webserver as a sidecar container
-9. Secrets from AWS Secrets Manager
+* Web server apps with ALB
+* ALB listener rules registrations.
+* TCP/UDP servers with NLB
+* Workers.
+* Cron jobs.
+* EC2 or FARGATE launch type.
+* Autoscaling
+* Volume mounts
+* Webserver as a sidecar container
+* Secrets from AWS Secrets Manager
 
 
 
@@ -187,9 +186,9 @@ The following requirements are needed by this module:
 
 The following providers are used by this module:
 
-- <a name="provider_aws"></a> [aws](#provider\_aws)
+- <a name="provider_aws"></a> [aws](#provider\_aws) (4.59.0)
 
-- <a name="provider_local"></a> [local](#provider\_local)
+- <a name="provider_local"></a> [local](#provider\_local) (2.4.0)
 
 ## Modules
 
