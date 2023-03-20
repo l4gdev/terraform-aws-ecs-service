@@ -1,15 +1,16 @@
-# L4G simple ECS module
+# L4G ECS module
 
- **!!work in progress!!** 
-
-**Supported features:** 
-1. Web server apps with ALB
-   1. automatic ALB listener rules registrations.
-2. TCP/UDP servers with NLB
-3. Workers.
-4. Cron jobs.
-5. EC2 or FARGATE launch type.
-6. Autoscaling
+## Supported features 
+* Web server apps with ALB
+* ALB listener rules registrations.
+* TCP/UDP servers with NLB
+* Workers.
+* Cron jobs.
+* EC2 or FARGATE launch type.
+* Autoscaling
+* Volume mounts
+* Webserver as a sidecar container
+* Secrets from AWS Secrets Manager
 
 
 
@@ -30,7 +31,19 @@ module "app" {
       local.app_envs,
     )
   }
-
+   web_server             = {
+    enabled = true
+    name    = "nginx"
+    image   = var.nginx_image
+    port    = 80
+  }
+   
+     placement_constraints = [
+    {
+      type       = "memberOf"
+      expression = "attribute:ecs.instance-type =~ c5.*"
+    }
+  ]
   list_of_secrets_in_secrets_manager_to_load = []
 
   aws_alb_listener_rule_conditions = [
@@ -56,7 +69,6 @@ module "app" {
     ecs_launch_type  = "EC2",
     ecs_cluster_name = local.ecs_cluster_name,
     run_type         = "WEB",
-    lang             = "STANDARD",
   }
 
   alb_listener_arn         = data.terraform_remote_state.backend.outputs.alb_arn
@@ -151,7 +163,6 @@ module "asset-workers" {
     ecs_launch_type  = "EC2",
     ecs_cluster_name = local.terraform_env.ecs_cluster.name,
     run_type         = "WORKER",
-    lang             = "STANDARD",
   }
 
   tags = {
@@ -175,9 +186,9 @@ The following requirements are needed by this module:
 
 The following providers are used by this module:
 
-- <a name="provider_aws"></a> [aws](#provider\_aws)
+- <a name="provider_aws"></a> [aws](#provider\_aws) (4.59.0)
 
-- <a name="provider_local"></a> [local](#provider\_local)
+- <a name="provider_local"></a> [local](#provider\_local) (2.4.0)
 
 ## Modules
 

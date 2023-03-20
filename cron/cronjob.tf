@@ -44,4 +44,3 @@ resource "aws_cloudwatch_event_target" "ecs_scheduled_task" {
     }
   )
 }
-
