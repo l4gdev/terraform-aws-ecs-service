@@ -1,4 +1,4 @@
-resource "aws_iam_role" "ecs-execution" {
+resource "aws_iam_role" "ecs_task_execution_role" {
   name = lower("${local.tags.Service}-${substr(md5("${var.application_config.environment}-${var.application_config.name}"), 0, 20)}-ecs-task-execution-role")
   assume_role_policy = jsonencode({
     Version : "2012-10-17",
@@ -14,16 +14,17 @@ resource "aws_iam_role" "ecs-execution" {
     ]
   })
   tags = local.tags
+
 }
 
 resource "aws_iam_role_policy_attachment" "ecs-execution" {
   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
-  role       = aws_iam_role.ecs-execution.name
+  role       = aws_iam_role.ecs_task_execution_role.name
 }
 
 resource "aws_iam_role_policy" "ssm_access" {
   count = length(local.check_if_secretmanager_json_load_not_empty) > 0 && !var.store_secrets_at_s3.enable ? 1 : 0
-  role  = aws_iam_role.ecs-execution.name
+  role  = aws_iam_role.ecs_task_execution_role.name
   policy = jsonencode({
     Version : "2012-10-17",
     Statement : [
@@ -49,7 +50,7 @@ resource "aws_iam_role_policy" "ssm_access" {
 
 resource "aws_iam_role_policy" "get_s3_envs" {
   count = var.store_secrets_at_s3.enable ? 1 : 0
-  role  = aws_iam_role.ecs-execution.name
+  role  = aws_iam_role.ecs_task_execution_role.name
   policy = jsonencode({
     Version : "2012-10-17",
     Statement : [
@@ -76,7 +77,7 @@ resource "aws_iam_role_policy" "get_s3_envs" {
 }
 
 ################# Service role #################
-resource "aws_iam_role" "service" {
+resource "aws_iam_role" "service_role" {
   name = lower("${local.tags.Service}-${substr(md5("${var.application_config.environment}-${var.application_config.name}"), 0, 20)}-ecs-task-service-role")
   assume_role_policy = jsonencode({
     Version : "2012-10-17",
@@ -96,7 +97,7 @@ resource "aws_iam_role" "service" {
 
 ################# Custom application policy ##################
 resource "aws_iam_role_policy" "service" {
-  role   = aws_iam_role.service.name
+  role   = aws_iam_role.service_role.name
   policy = var.service_policy == "" ? data.aws_iam_policy_document.placeholder.json : var.service_policy
 }
 
@@ -109,11 +110,11 @@ data "aws_iam_policy_document" "placeholder" {
 }
 
 output "task_iam_role_name" {
-  value = aws_iam_role.service.name
+  value = aws_iam_role.service_role.name
 }
 
 output "task_iam_role_arn" {
-  value = aws_iam_role.service.arn
+  value = aws_iam_role.service_role.arn
 }
 
 ##################

@@ -1,13 +1,12 @@
-resource "aws_ecs_task_definition" "service" {
-  count                    = var.ecs_settings.ecs_launch_type == "CRON" ? 0 : 1
-  family                   = "${var.application_config.environment}-${var.application_config.name}"
-  execution_role_arn       = aws_iam_role.ecs_task_execution_role.arn
+resource "aws_ecs_task_definition" "cron" {
+  family                   = "${var.application_config.environment}-${var.application_config.name}-${var.cron_settings.name}"
+  execution_role_arn       = var.ecs_execution_arn
   network_mode             = var.network_mode == null ? var.ecs_settings.ecs_launch_type == "FARGATE" ? "awsvpc" : "bridge" : var.network_mode
   requires_compatibilities = [var.ecs_settings.ecs_launch_type]
   cpu                      = var.application_config.cpu == 0 ? "" : var.application_config.cpu
   memory                   = var.application_config.memory
-  container_definitions    = local.running_container_definitions
-  task_role_arn            = aws_iam_role.service_role.arn
+  container_definitions    = var.running_container_definitions
+  task_role_arn            = var.task_role_service_arn
 
   dynamic "volume" {
     for_each = var.volumes
@@ -43,5 +42,10 @@ resource "aws_ecs_task_definition" "service" {
       operating_system_family = "LINUX"
     }
   }
-  tags = local.tags
+  tags = merge(var.tags, {
+    Type            = "cron"
+    Cron-Name       = var.cron_settings.name
+    Cron-Expression = replace(replace(trim(trim(var.cron_settings.schedule_expression, "cron("), ")"), "?", "q"), "*", ".")
+    Cron-Command    = var.cron_settings.args
+  })
 }

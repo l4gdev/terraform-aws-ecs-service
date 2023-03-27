@@ -1,7 +1,3 @@
-variable "task_definition_arn" {
-  type = string
-}
-
 variable "ecs_settings" {
   type = any
 }
@@ -35,6 +31,7 @@ variable "application_config" {
 variable "tags" {
   type = any
 }
+
 variable "launch_type" {
   type = any
 }
@@ -42,6 +39,27 @@ variable "launch_type" {
 variable "subnets" {
   type = list(string)
 }
+
 variable "security_groups" {
   type = list(string)
+}
+
+variable "ecs_execution_arn" {
+  type = string
+}
+
+variable "network_mode" {
+  type = string
+}
+
+variable "running_container_definitions" {
+  type = string
+}
+
+variable "task_role_service_arn" {
+  type = string
+}
+
+variable "volumes" {
+  type = any
 }
