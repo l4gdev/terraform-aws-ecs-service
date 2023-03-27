@@ -1,6 +1,7 @@
 locals {
   tags = merge({
     Service = var.application_config.name
+    Type    = lower(var.ecs_settings.run_type)
   }, var.tags)
 
   env_mapped = [

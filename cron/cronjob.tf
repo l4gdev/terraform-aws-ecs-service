@@ -1,5 +1,5 @@
 resource "aws_cloudwatch_event_rule" "rule" {
-  name                = "${substr(var.application_config.environment, 0, 5)}-${var.application_config.name}-${replace(var.cron_settings.name, ":", "-")}"
+  name                = "${substr(var.application_config.environment, 0, 5)}-${var.application_config.name}-${var.cron_settings.name}"
   schedule_expression = var.cron_settings.schedule_expression
 }
 
@@ -9,18 +9,18 @@ data "aws_ecs_cluster" "cluster" {
 
 
 resource "aws_cloudwatch_event_target" "ecs_scheduled_task" {
-  target_id = "${var.application_config.environment}-${replace(var.cron_settings.name, ":", "-")}"
+  target_id = "${var.application_config.environment}-${var.cron_settings.name}"
   arn       = data.aws_ecs_cluster.cluster.arn
   rule      = aws_cloudwatch_event_rule.rule.name
   role_arn  = var.iam_role_arn
 
   ecs_target {
     task_count          = var.cron_settings.desired_count
-    task_definition_arn = var.task_definition_arn
+    task_definition_arn = aws_ecs_task_definition.cron.arn
     propagate_tags      = "TASK_DEFINITION"
     tags = merge(var.tags, {
-      Type    = "cron",
-      Command = var.cron_settings.args
+      Type         = "cron",
+      Cron-Command = var.cron_settings.args
     })
     launch_type = var.launch_type
     dynamic "network_configuration" {

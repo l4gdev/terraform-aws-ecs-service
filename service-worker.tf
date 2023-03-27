@@ -3,7 +3,7 @@ resource "aws_ecs_service" "service_worker" {
 
   name                               = var.application_config.name
   cluster                            = var.ecs_settings.ecs_cluster_name
-  task_definition                    = aws_ecs_task_definition.service.id
+  task_definition                    = aws_ecs_task_definition.service[0].id
   desired_count                      = var.deployment.first_deployment_desired_count
   launch_type                        = var.ecs_settings.ecs_launch_type
   deployment_minimum_healthy_percent = var.deployment.minimum_healthy_percent
@@ -12,7 +12,7 @@ resource "aws_ecs_service" "service_worker" {
   propagate_tags                     = "TASK_DEFINITION"
 
   dynamic "network_configuration" {
-    for_each = aws_ecs_task_definition.service.network_mode != "bridge" || var.ecs_settings.ecs_launch_type == "FARGATE" ? [1] : []
+    for_each = aws_ecs_task_definition.service[0].network_mode != "bridge" || var.ecs_settings.ecs_launch_type == "FARGATE" ? [1] : []
     content {
       subnets          = var.subnets
       security_groups  = var.security_groups
