@@ -31,7 +31,7 @@ resource "aws_iam_role_policy" "ecs_events_run_task_with_any_role" {
         {
           "Effect" : "Allow",
           "Action" : "iam:PassRole",
-          "Resource" : aws_iam_role.service_role.arn
+          "Resource" : "*"
         },
         {
           "Effect" : "Allow",
