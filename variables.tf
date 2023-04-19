@@ -129,7 +129,7 @@ variable "cron" {
   type = object({
     settings = list(object({
       name                = string
-      args                = string
+      args                = list(string)
       schedule_expression = string
       desired_count       = optional(number, 1)
     })),

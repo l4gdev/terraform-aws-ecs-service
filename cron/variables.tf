@@ -9,7 +9,7 @@ variable "iam_role_arn" {
 variable "cron_settings" {
   type = object({
     name                = string
-    args                = string
+    args                = list(string)
     schedule_expression = string
     desired_count       = number
     execution_script    = list(string)

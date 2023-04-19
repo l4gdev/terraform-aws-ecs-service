@@ -37,7 +37,7 @@ resource "aws_cloudwatch_event_target" "ecs_scheduled_task" {
     {
       containerOverrides = [
         {
-          command = concat(try(var.cron_settings.execution_script, []), split(" ", var.cron_settings.args))
+          command = concat(try(var.cron_settings.execution_script, []), var.cron_settings.args)
           name    = var.application_config.name
         }
       ]
