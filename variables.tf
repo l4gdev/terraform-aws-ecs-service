@@ -210,6 +210,37 @@ variable "aws_alb_listener_rule_conditions" {
   }
 }
 
+variable "aws_alb_listener_rule_conditions_advance" {
+  type = list(object({
+    name = string
+    rules = list(object({
+      type             = string
+      values           = list(string)
+      http_header_name = optional(string, null)
+    }))
+    auth = optional(object({
+      type                                = string
+      authorization_endpoint              = optional(string, null)       # oidc
+      client_id                           = optional(string, null)       # oidc
+      client_secret                       = optional(string, null)       # oidc
+      issuer                              = optional(string, null)       # oidc
+      token_endpoint                      = optional(string, null)       # oidc
+      user_info_endpoint                  = optional(string, null)       # oidc
+      authentication_request_extra_params = optional(list(string), null) # cognito
+      on_unauthenticated_request          = optional(string, null)       # cognito
+      scope                               = optional(string, null)       # cognito
+      session_cookie_name                 = optional(string, null)       # cognito
+      session_timeout                     = optional(number, null)       # cognito
+      user_pool_arn                       = optional(string, null)       # cognito
+      user_pool_client_id                 = optional(string, null)       # cognito
+      user_pool_domain                    = optional(string, null)       # cognito
+    }), null)
+  }))
+  default     = null
+  description = "A list of maps describing the conditions of the rule. The order in which conditions are specified is not significant. Any condition block with a type of path-pattern or host-header must include a values block. For any other condition type, only one values block can be specified. For more information, see the AWS documentation on Listener Rules. Example: "
+}
+
+
 variable "tags" {
   type        = map(string)
   default     = {}
