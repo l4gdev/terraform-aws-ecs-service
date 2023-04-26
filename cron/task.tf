@@ -45,6 +45,6 @@ resource "aws_ecs_task_definition" "cron" {
   tags = merge(var.tags, {
     Type         = "cron"
     Cron-Name    = var.cron_settings.name
-    Cron-Command = var.cron_settings.args
+    Cron-Command = join(" ", var.cron_settings.args)
   })
 }

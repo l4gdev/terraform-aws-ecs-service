@@ -20,7 +20,7 @@ resource "aws_cloudwatch_event_target" "ecs_scheduled_task" {
     propagate_tags      = "TASK_DEFINITION"
     tags = merge(var.tags, {
       Type         = "cron",
-      Cron-Command = var.cron_settings.args
+      Cron-Command = join(" ", var.cron_settings.args)
     })
     launch_type = var.launch_type
     dynamic "network_configuration" {
