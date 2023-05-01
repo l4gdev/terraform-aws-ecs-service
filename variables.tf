@@ -332,3 +332,9 @@ variable "placement_constraints" {
   default     = []
   description = "Placement constraints for the task"
 }
+
+variable "enable_code_build" {
+  type        = bool
+  default     = false
+  description = "Enable code build"
+}

@@ -40,16 +40,16 @@ resource "aws_lb_listener_rule" "web-app-simple" {
 }
 
 locals {
-  aws_alb_listener_rule_conditions_advance_remap = {
+  aws_alb_listener_rule_conditions_advance_remap = try({
     for condition in var.aws_alb_listener_rule_conditions_advance : condition.name => condition
-  }
+  }, {})
 }
 
 
 resource "aws_lb_listener_rule" "web-app-advance" {
   for_each     = var.aws_alb_listener_rule_conditions_advance != null ? local.aws_alb_listener_rule_conditions_advance_remap : {}
   listener_arn = var.alb_listener_arn
- priority = each.value["priority"]
+  priority     = each.value["priority"]
   action {
     type             = "forward"
     target_group_arn = aws_lb_target_group.app[0].arn
