@@ -1,5 +1,5 @@
 resource "aws_lb_listener_rule" "web-app-simple" {
-  count        = contains(["WEB"], var.ecs_settings.run_type) && var.aws_alb_listener_rule_conditions_advance == null ? 1 : 0
+  count        = contains(["WEB"], var.ecs_settings.run_type) && var.aws_alb_listener_rule_conditions_advanced == null ? 1 : 0
   listener_arn = var.alb_listener_arn
 
   action {
@@ -41,13 +41,13 @@ resource "aws_lb_listener_rule" "web-app-simple" {
 
 locals {
   aws_alb_listener_rule_conditions_advance_remap = try({
-    for condition in var.aws_alb_listener_rule_conditions_advance : condition.name => condition
+    for condition in var.aws_alb_listener_rule_conditions_advanced : condition.name => condition
   }, {})
 }
 
 
 resource "aws_lb_listener_rule" "web-app-advance" {
-  for_each     = var.aws_alb_listener_rule_conditions_advance != null ? local.aws_alb_listener_rule_conditions_advance_remap : {}
+  for_each     = var.aws_alb_listener_rule_conditions_advanced != null ? local.aws_alb_listener_rule_conditions_advance_remap : {}
   listener_arn = var.alb_listener_arn
   priority     = each.value["priority"]
   action {

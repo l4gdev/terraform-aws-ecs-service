@@ -210,7 +210,7 @@ variable "aws_alb_listener_rule_conditions" {
   }
 }
 
-variable "aws_alb_listener_rule_conditions_advance" {
+variable "aws_alb_listener_rule_conditions_advanced" {
   type = list(object({
     name = string
     rules = list(object({

@@ -24,9 +24,7 @@ locals {
   ])
 
   check_if_secretmanager_json_load_not_empty = length(local.secretmanager_json_load) > 0 ? tolist(local.secretmanager_json_load) : []
-
-
-  secrets_mapped = local.check_if_secretmanager_json_load_not_empty
+  secrets_mapped                             = local.check_if_secretmanager_json_load_not_empty
 
   task_app_configuration = {
     WEB    = concat([local.web_standard_container_configuration], var.web_server.enabled == true ? [local.webserver_container_configuration] : [])

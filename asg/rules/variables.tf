@@ -2,7 +2,7 @@ variable "rule" {
   type = string
 }
 variable "ecs_target" {
-  type = map(string)
+  type = any
 }
 
 variable "service" {
