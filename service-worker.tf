@@ -5,7 +5,7 @@ resource "aws_ecs_service" "service_worker" {
   cluster                            = var.ecs_settings.ecs_cluster_name
   task_definition                    = aws_ecs_task_definition.service[0].id
   desired_count                      = var.deployment.first_deployment_desired_count
-  launch_type                        = var.ecs_settings.ecs_launch_type
+  launch_type                        = var.capacity_provider_strategy == [] ? var.ecs_settings.ecs_launch_type : null
   deployment_minimum_healthy_percent = var.deployment.minimum_healthy_percent
   deployment_maximum_percent         = var.deployment.maximum_healthy_percent
   scheduling_strategy                = var.scheduling_strategy
