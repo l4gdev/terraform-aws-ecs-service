@@ -338,3 +338,11 @@ variable "enable_code_build" {
   default     = false
   description = "Enable code build"
 }
+
+variable "capacity_provider_strategy" {
+  type = list(object({
+    capacity_provider = string
+    weight            = optional(number, 1)
+    base              = optional(number, 0)
+  }))
+}

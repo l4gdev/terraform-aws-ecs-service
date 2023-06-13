@@ -17,6 +17,15 @@ resource "aws_ecs_service" "service_web" {
     container_port   = var.web_server.enabled ? var.web_server.container_port : var.application_config.port
   }
 
+  dynamic "capacity_provider_strategy" {
+    for_each = var.capacity_provider_strategy
+    content {
+      capacity_provider = capacity_provider_strategy.value.capacity_provider
+      weight            = capacity_provider_strategy.value.weight
+      base              = capacity_provider_strategy.value.base
+    }
+  }
+
   dynamic "network_configuration" {
     for_each = aws_ecs_task_definition.service[0].network_mode != "bridge" || var.ecs_settings.ecs_launch_type == "FARGATE" ? [1] : []
     content {

@@ -20,6 +20,15 @@ resource "aws_ecs_service" "service_worker" {
     }
   }
 
+  dynamic "capacity_provider_strategy" {
+    for_each = var.capacity_provider_strategy
+    content {
+      capacity_provider = capacity_provider_strategy.value.capacity_provider
+      weight            = capacity_provider_strategy.value.weight
+      base              = capacity_provider_strategy.value.base
+    }
+  }
+
   dynamic "ordered_placement_strategy" {
     for_each = var.ordered_placement_strategy
     content {

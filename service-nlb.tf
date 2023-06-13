@@ -1,3 +1,4 @@
+
 resource "aws_ecs_service" "service_net" {
   count = contains(["NLB"], var.ecs_settings.run_type) ? 1 : 0
 
@@ -11,6 +12,15 @@ resource "aws_ecs_service" "service_net" {
   deployment_maximum_percent         = var.deployment.maximum_healthy_percent
   propagate_tags                     = "TASK_DEFINITION"
 
+  dynamic "capacity_provider_strategy" {
+    for_each = var.capacity_provider_strategy
+    content {
+      capacity_provider = capacity_provider_strategy.value.capacity_provider
+      weight            = capacity_provider_strategy.value.weight
+      base              = capacity_provider_strategy.value.base
+    }
+  }
+
   dynamic "load_balancer" {
     for_each = aws_lb_target_group.network_lb_target
     content {
@@ -20,7 +30,9 @@ resource "aws_ecs_service" "service_net" {
     }
   }
   dynamic "network_configuration" {
-    for_each = aws_ecs_task_definition.service[0].network_mode != "bridge" || var.ecs_settings.ecs_launch_type == "FARGATE" ? [1] : []
+    for_each = aws_ecs_task_definition.service[0].network_mode != "bridge" || var.ecs_settings.ecs_launch_type == "FARGATE" ? [
+      1
+    ] : []
     content {
       subnets          = var.subnets
       security_groups  = var.security_groups
