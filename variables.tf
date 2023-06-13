@@ -340,6 +340,7 @@ variable "enable_code_build" {
 }
 
 variable "capacity_provider_strategy" {
+  default = []
   type = list(object({
     capacity_provider = string
     weight            = optional(number, 1)
