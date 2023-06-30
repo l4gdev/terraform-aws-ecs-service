@@ -18,7 +18,6 @@ resource "aws_lb_listener" "network_lb_listener" {
   depends_on = [aws_lb_target_group.network_lb_target]
 }
 
-
 resource "aws_lb_target_group" "network_lb_target" {
   for_each    = local.nlb_port_map
   name        = lower("${var.application_config.environment}-${var.application_config.name}-${each.key}")

@@ -63,3 +63,12 @@ variable "task_role_service_arn" {
 variable "volumes" {
   type = any
 }
+
+variable "capacity_provider_strategy" {
+  default = []
+  type = list(object({
+    capacity_provider = string
+    weight            = optional(number, 1)
+    base              = optional(number, 0)
+  }))
+}

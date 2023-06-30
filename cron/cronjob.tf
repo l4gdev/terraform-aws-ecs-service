@@ -7,7 +7,6 @@ data "aws_ecs_cluster" "cluster" {
   cluster_name = var.ecs_settings.ecs_cluster_name
 }
 
-
 resource "aws_cloudwatch_event_target" "ecs_scheduled_task" {
   target_id = "${var.application_config.environment}-${var.cron_settings.name}"
   arn       = data.aws_ecs_cluster.cluster.arn
@@ -23,6 +22,16 @@ resource "aws_cloudwatch_event_target" "ecs_scheduled_task" {
       Cron-Command = join(" ", var.cron_settings.args)
     })
     launch_type = var.launch_type
+
+    dynamic "capacity_provider_strategy" {
+      for_each = var.capacity_provider_strategy
+      content {
+        capacity_provider = capacity_provider_strategy.value.capacity_provider
+        weight            = capacity_provider_strategy.value.weight
+        base              = capacity_provider_strategy.value.base
+      }
+    }
+
     dynamic "network_configuration" {
       for_each = var.launch_type == "FARGATE" ? [1] : []
       content {
