@@ -1,6 +1,12 @@
 resource "aws_cloudwatch_event_rule" "rule" {
   name                = "${substr(var.application_config.environment, 0, 5)}-${var.application_config.name}-${var.cron_settings.name}"
   schedule_expression = var.cron_settings.schedule_expression
+
+  tags = merge(var.tags, {
+    Type         = "cron"
+    Cron-Name    = var.cron_settings.name
+    Cron-Command = join(" ", var.cron_settings.args)
+  })
 }
 
 data "aws_ecs_cluster" "cluster" {
