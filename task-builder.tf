@@ -43,7 +43,7 @@ locals {
   log_configuration = {
     logDriver = "awslogs",
     options = {
-      awslogs-group         = aws_cloudwatch_log_group.task_log_group.name,
+      awslogs-group         = aws_cloudwatch_log_group.task_log_group[0].name,
       awslogs-region        = data.aws_region.current.name,
       awslogs-create-group  = "true",
       awslogs-stream-prefix = "ecs",
@@ -78,12 +78,14 @@ locals {
   }
 
   datadog_fargate_sidecar = {
-    name  = "datadog"
-    image = var.fargate_datadog_sidecar_parameters.image,
+    name             = "datadog"
+    image            = var.fargate_datadog_sidecar_parameters.image,
+    logConfiguration = local.log_configuration
+
     environment = [
       {
         name  = "DD_API_KEY"
-        value = var.fargate_datadog_sidecar_parameters
+        value = var.fargate_datadog_sidecar_parameters.key
       },
       {
         name  = "ECS_FARGATE",
@@ -92,30 +94,26 @@ locals {
       {
         name  = "DD_SITE"
         value = var.fargate_datadog_sidecar_parameters.dd_site
+      },
+      {
+        name  = "DD_APM_ENABLED"
+        value = "true"
       }
     ],
+    #    healthCheck = {
+    #      retries     = "3",
+    #      command     = ["CMD-SHELL", "agent health"],
+    #      timeout     = 5,
+    #      interval    = 30,
+    #      startPeriod = 15
+    #    }
+
   }
   ######################## OTHER #####################
-
   environmentFiles = [
     {
       value : try("arn:aws:s3:::${var.store_secrets_at_s3.bucket_name}${aws_s3_object.secrets[0].key}", ""),
       type : "s3"
     }
   ]
-
-
-}
-
-variable "fargate_datadog_sidecar_parameters" {
-  type = object({
-    image   = string
-    dd_site = string
-    key     = string
-  })
-  default = {
-    image   = "public.ecr.aws/datadog/agent:latest",
-    dd_site = "datadoghq.eu"
-    key     = null
-  }
 }

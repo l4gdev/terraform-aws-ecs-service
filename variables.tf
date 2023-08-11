@@ -305,10 +305,16 @@ variable "volumes_mount_point" {
   description = "Volumes mount point at host"
 }
 
-variable "retention_in_days" {
-  type        = number
-  default     = 30
-  description = "(Optional) Specifies the number of days you want to retain log events in the specified log group. Possible values are: 1, 3, 5, 7, 14, 30, 60, 90, 120, 150, 180, 365, 400, 545, 731, 1827, 3653, and 0. If you select 0, the events in the log group are always retained and never expire."
+variable "cloudwatch_logs" {
+  type = object({
+    enabled           = optional(bool, true)
+    retention_in_days = optional(number, 30)
+  })
+  default = {
+    enabled           = true
+    retention_in_days = 30
+  }
+  description = "Cloudwatch logs configuration"
 }
 
 variable "ordered_placement_strategy" {
@@ -346,4 +352,17 @@ variable "capacity_provider_strategy" {
     weight            = optional(number, 1)
     base              = optional(number, 0)
   }))
+}
+
+variable "fargate_datadog_sidecar_parameters" {
+  type = object({
+    image   = optional(string, "public.ecr.aws/datadog/agent:latest")
+    dd_site = optional(string, "datadoghq.eu")
+    key     = string
+  })
+  default = {
+    image   = "public.ecr.aws/datadog/agent:latest",
+    dd_site = "datadoghq.eu"
+    key     = null
+  }
 }
