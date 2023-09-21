@@ -1,5 +1,5 @@
 resource "aws_iam_role" "ecs_task_execution_role" {
-  name_prefix = lower("${local.tags.Service}-${substr(md5("${var.application_config.environment}-${var.application_config.name}"), 0, 20)}-ecs-task-execution-role")
+  name_prefix = lower("${local.tags.Service}-${substr(md5("${var.application_config.environment}-${var.application_config.name}"), 0, 8)}-ecs-task-execution-role")
   assume_role_policy = jsonencode({
     Version : "2012-10-17",
     Statement : [
@@ -78,7 +78,7 @@ resource "aws_iam_role_policy" "get_s3_envs" {
 
 ################# Service role #################
 resource "aws_iam_role" "service_role" {
-  name_prefix = lower("${local.tags.Service}-${substr(md5("${var.application_config.environment}-${var.application_config.name}"), 0, 20)}-ecs-task-service-role")
+  name_prefix = lower("${local.tags.Service}-${substr(md5("${var.application_config.environment}-${var.application_config.name}"), 0, 8)}-ecs-task-service-role")
   assume_role_policy = jsonencode({
     Version : "2012-10-17",
     Statement : [
