@@ -1,6 +1,6 @@
 resource "aws_iam_role" "ecs_events" {
   count = contains(["CRON"], var.ecs_settings.run_type) ? 1 : 0
-  name  = "${var.application_config.environment}-${var.application_config.name}"
+  name_prefix  = "${var.application_config.environment}-${var.application_config.name}"
   assume_role_policy = jsonencode(
     {
       "Version" : "2012-10-17",
